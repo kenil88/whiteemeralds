@@ -401,7 +401,7 @@ class RvMedia
 
             return response(
                 '<script>window.parent.CKEDITOR.tools.callFunction("' . $request->input('CKEditorFuncNum') .
-                '", "' . $this->url($file->url) . '", "");</script>'
+                    '", "' . $this->url($file->url) . '", "");</script>'
             )
                 ->header('Content-Type', 'text/html');
         }
@@ -620,7 +620,8 @@ class RvMedia
 
         $folderIds = json_decode(setting('media_folders_can_add_watermark', ''), true);
 
-        if (empty($folderIds) ||
+        if (
+            empty($folderIds) ||
             in_array($file->folder_id, $folderIds) ||
             ! empty(array_intersect($file->folder->parents->pluck('id')->all(), $folderIds))
         ) {
@@ -923,7 +924,7 @@ class RvMedia
                         'slug' => $folderSlug,
                         'parent_id' => $parentId,
                     ])
-                    ->each(fn (MediaFolder $folder) => $folder->forceDelete());
+                    ->each(fn(MediaFolder $folder) => $folder->forceDelete());
             }
 
             $folder = MediaFolder::query()->create([

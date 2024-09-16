@@ -112,9 +112,12 @@ class PublicAjaxController extends BaseController
         $diamond_weight = 0;
         $diamond_type = '';
         $gold_purity = '';
-
+        $default_size = 13; // Reference size
+        // dd($request['options']);
         foreach ($request['options'] as $product_option_id => $value) {
             // Fetch options related to the product
+
+
             $option_query = Option::select(
                 'ec_option_value.id as opv_id',
                 'ec_options.name',
@@ -151,6 +154,22 @@ class PublicAjaxController extends BaseController
                     } elseif ($value == '18K' && $option_value == '18K') {
                         $gold_weight = $weight;  // Set weight for 18k gold
                         $metal_purity = '18k';  // Mark gold purity as 18k
+                    }
+
+                    if (is_numeric($value)) {
+                        $selected_size = (int) $value;
+                        $size_difference = $selected_size - $default_size; // Calculate the size difference
+
+                        // Adjust gold weight by 0.150 for each size difference
+                        $weight_change = abs($size_difference) * 0.150;
+
+                        if ($size_difference > 0) {
+                            // Size increased, increase gold weight
+                            $gold_weight += $weight_change;
+                        } elseif ($size_difference < 0) {
+                            // Size decreased, decrease gold weight
+                            $gold_weight -= $weight_change;
+                        }
                     }
                 }
             }

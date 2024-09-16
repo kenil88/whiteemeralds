@@ -12,13 +12,18 @@
                 type="hidden"
                 value="dropdown"
             />
+            <input type="hidden" name="ring_category" value="{{ $product->categories[0]->name }}">
             <select
                 class="form-select"
-                name="options[{{ $option->id }}][values]"
+                name="options[{{ $option->id }}]"
                 {{ $option->required ? 'required' : '' }}
             >
                 <option value="">{{ __('Select an option') }}</option>
-                @foreach ($option->values as $value)
+                @php
+                    // Sort values by option_value in ascending order
+                    $sortedValues = $option->values->sortBy('option_value');
+                @endphp
+                @foreach ($sortedValues as $value)
                     @php
                         $price = 0;
                         if (!empty($value->affect_price) && doubleval($value->affect_price) > 0) {
@@ -28,9 +33,11 @@
                     <option
                         data-extra-price="{{ $price }}"
                         value="{{ $value->option_value }}"
+                        {{ strtolower($product->categories[0]->name) == 'ladies ring' && $value->option_value == 13 ? 'selected' : '' }}
                     >{{ $value->option_value }} {{ $price > 0 ? '+' . format_price($price) : '' }}</option>
                 @endforeach
             </select>
+            <x-core::size-chart />
         </div>
     </div>
 </div>
