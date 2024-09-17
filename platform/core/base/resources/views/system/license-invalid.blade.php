@@ -4,7 +4,7 @@
         ->hasPermission('core.manage.license');
 @endphp
 
-<x-core::alert
+{{-- <x-core::alert
     type="warning"
     :important="true"
     @class(['alert-license alert-sticky small', 'vertical-wrapper' => AdminAppearance::isVerticalLayout()])
@@ -32,7 +32,7 @@
             @endif
         </div>
     </div>
-</x-core::alert>
+</x-core::alert> --}}
 
 @if ($manageLicense)
     @include('core/base::system.partials.license-activation-modal')
