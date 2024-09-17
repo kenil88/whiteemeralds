@@ -30,8 +30,8 @@
                 @endif
             @endforeach
         </span>
-        @if ($price > 0)
+        {{-- @if ($price > 0)
             <strong>+ {{ format_price($price) }}</strong>
-        @endif
+        @endif --}}
     </div>
 @endforeach

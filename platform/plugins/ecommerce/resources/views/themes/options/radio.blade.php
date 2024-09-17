@@ -57,7 +57,7 @@
                     <div class="{{ $wrapperClass ?? 'form-radio' }}">
                         <input
                             id="option-{{ $option->id }}-value-{{ Str::slug($value->option_value) }}"
-                            name="options[{{ $option->id }}]"
+                            name="options[{{ $option->id }}][values]"
                             data-extra-price="{{ $price }}" data-option-id={{ $option->id }}
                             type="radio" data-option-value={{ Str::slug($value->option_value)}}
                             value="{{ $value->option_value }}"
@@ -70,7 +70,8 @@
                                     $firstValidOptionSelected = true;
                                 @endphp
                             @endif --}}
-                        >                        
+                        >
+                        
                         <label for="option-{{ $option->id }}-value-{{ Str::slug($value->option_value) }}" @if (isset($labelClass)) class="{{ $labelClass }}" @endif>
                             &nbsp;{{ $value->option_value }}
                             {{-- @if ($price > 0)

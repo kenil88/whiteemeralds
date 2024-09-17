@@ -46,7 +46,7 @@
 
 <x-core::form :url="route('public.cart.add-to-cart')" method="POST" class="product-form">
     <input type="hidden" name="id" value="{{ $product->getIdForCart() }}" />
-
+<input type="hidden" name="product_price" value="" id="set_product_price">
     @if ($product->variations->isNotEmpty())
         {!! render_product_swatches($product, ['selected' => $selectedAttrs]) !!}
     @endif

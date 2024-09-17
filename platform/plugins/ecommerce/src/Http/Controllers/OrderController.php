@@ -64,8 +64,7 @@ class OrderController extends BaseController
         protected HandleShippingFeeService $shippingFeeService,
         protected HandleApplyCouponService $handleApplyCouponService,
         protected HandleApplyPromotionsService $applyPromotionsService
-    ) {
-    }
+    ) {}
 
     protected function breadcrumb(): Breadcrumb
     {

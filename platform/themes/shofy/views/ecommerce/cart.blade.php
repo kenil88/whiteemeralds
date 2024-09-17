@@ -78,7 +78,7 @@
                                                 @include(Theme::getThemeNamespace('views.ecommerce.includes.cart-quantity'))
                                             </td>
                                             <td class="tp-cart-total" data-title="{{ __('Total') }}">
-                                                {{ format_price($cartItem->price * $cartItem->qty) }}
+                                                {{ format_price(Session::get('price_without_symbol') * $cartItem->qty) }}
                                             </td>
                                             <td class="tp-cart-action" data-title="{{ __('Remove') }}">
                                                 <button
@@ -116,12 +116,12 @@
                             <span class="tp-cart-checkout-top-title">{{ __('Subtotal') }}</span>
                             <span class="tp-cart-checkout-top-price">{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
                         </div>
-                        @if (EcommerceHelper::isTaxEnabled())
+                        {{-- @if (EcommerceHelper::isTaxEnabled())
                             <div class="tp-cart-checkout-tax d-flex align-items-center justify-content-between mb-2">
                                 <span class="tp-cart-checkout-tax-title">{{ __('Tax') }}</span>
                                 <span class="tp-cart-checkout-tax-price">{{ format_price(Cart::instance('cart')->rawTax()) }}</span>
                             </div>
-                        @endif
+                        @endif --}}
                         @if ($couponDiscountAmount > 0 && session('applied_coupon_code'))
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <div>
@@ -159,7 +159,7 @@
                             @endphp
                         @endif
 
-                        <div class="d-flex align-items-center justify-content-between mb-2">
+                        {{-- <div class="d-flex align-items-center justify-content-between mb-2">
                             <span>{{ __('Making Charge') }}</span>
                             @if(session('currency_data') == 'INR')
                             <span data-bb-value="cart-promotion-discount-amount">{{ format_price($making_charges) }}</span>
@@ -174,10 +174,10 @@
                             @else
                             <spa data-bb-value="cart-promotion-discount-amount"n>{{ format_price($certificate_charge) }}</span>
                             @endif
-                        </div>
+                        </div> --}}
                         <div class="tp-cart-checkout-total d-flex align-items-center justify-content-between mt-3 mb-0">
                             <span>{{ __('Total') }}</span>
-                            <span>{{ ($promotionDiscountAmount + $couponDiscountAmount) > Cart::instance('cart')->rawTotal() ? format_price(0) : format_price(Cart::instance('cart')->rawTotal() - $promotionDiscountAmount - $couponDiscountAmount) }}</span>
+                            <span>{{ ($promotionDiscountAmount + $couponDiscountAmount) > Session::get('price_without_symbol') ? format_price(0) : format_price(Session::get('price_without_symbol') - $promotionDiscountAmount - $couponDiscountAmount) }}</span>
                         </div>
                         <p class="small">{{ __('(Shipping fees not included)') }}</p>
                         <div class="tp-cart-checkout-proceed">

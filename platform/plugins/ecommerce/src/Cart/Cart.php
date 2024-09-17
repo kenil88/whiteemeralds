@@ -21,6 +21,7 @@ use Illuminate\Events\NullDispatcher;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 
 class Cart
 {
@@ -331,11 +332,12 @@ class Cart
 
     public function rawSubTotal(): float
     {
-        $content = $this->getContent();
+        return Session::get('price_without_symbol');
+        // $content = $this->getContent();
 
-        return $content->reduce(function ($subTotal, CartItem $cartItem) {
-            return $subTotal + ($cartItem->qty * $cartItem->price);
-        }, 0);
+        // return $content->reduce(function ($subTotal, CartItem $cartItem) {
+        //     return $subTotal + ($cartItem->qty * $cartItem->price);
+        // }, 0);
     }
 
     public function rawSubTotalByItems($content): float

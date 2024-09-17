@@ -15,7 +15,7 @@
             <input type="hidden" name="ring_category" value="{{ $product->categories[0]->name }}">
             <select
                 class="form-select"
-                name="options[{{ $option->id }}]"
+                name="options[{{ $option->id }}][values]"
                 {{ $option->required ? 'required' : '' }}
             >
                 <option value="">{{ __('Select an option') }}</option>

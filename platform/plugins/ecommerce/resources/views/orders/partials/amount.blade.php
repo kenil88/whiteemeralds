@@ -11,7 +11,7 @@
             </p>
         </div>
     </div>
-    @if (EcommerceHelper::isTaxEnabled())
+    {{-- @if (EcommerceHelper::isTaxEnabled())
         <div class="row">
             <div class="col-6">
                 <p>{{ __('Tax') }} @if (Cart::instance('cart')->rawTax())
@@ -24,7 +24,7 @@
                 </p>
             </div>
         </div>
-    @endif
+    @endif --}}
     @if (session('applied_coupon_code'))
         <div class="row coupon-information">
             <div class="col-6">
@@ -61,7 +61,7 @@
             </div>
         </div>
     @endif
-    @if (!empty($shipping) && Arr::get($sessionCheckoutData, 'is_available_shipping', true))
+    {{-- @if (!empty($shipping) && Arr::get($sessionCheckoutData, 'is_available_shipping', true))
         <div class="row">
             <div class="col-6">
                 <p>{{ __('Shipping fee') }}:</p>
@@ -70,7 +70,7 @@
                 <p class="price-text shipping-price-text">{{ format_price($shippingAmount) }}</p>
             </div>
         </div>
-    @endif
+    @endif --}}
 
      @php
         $originalProducts = Cart::instance('cart')->products();
@@ -102,7 +102,7 @@
             @endphp
         @endif
 
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-6">
             <p>{{ __('Making Charge') }}:</p>
         </div>
@@ -117,7 +117,7 @@
         <div class="col-6 float-end">
             <p class="price-text shipping-price-text">{{ format_price($certificate_charge) }}</p>
         </div>
-    </div>
+    </div> --}}
 
     <div class="row">
         <div class="col-6">
@@ -125,7 +125,7 @@
         </div>
         <div class="col-6 float-end">
             <p class="total-text raw-total-text" data-price="{{ format_price($rawTotal, null, true) }}">
-                {{ format_price($orderAmount + $totalMakingCharges + $certificate_charge) }}
+                {{ format_price($orderAmount) }}
             </p>
         </div>
     </div>

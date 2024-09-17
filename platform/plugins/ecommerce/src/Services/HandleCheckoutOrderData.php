@@ -12,6 +12,7 @@ use Botble\Payment\Supports\PaymentHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Session;
 
 class HandleCheckoutOrderData
 {
@@ -21,8 +22,7 @@ class HandleCheckoutOrderData
         protected HandleApplyCouponService $applyCouponService,
         protected HandleRemoveCouponService $removeCouponService,
         protected HandleSetCountryForPaymentCheckout $setCountryForPaymentCheckout
-    ) {
-    }
+    ) {}
 
     public function execute(Request $request, Collection $products, string $token, array &$sessionCheckoutData): CheckoutOrderData
     {
@@ -77,7 +77,7 @@ class HandleCheckoutOrderData
                 $couponDiscountAmount = Arr::get($sessionCheckoutData, 'coupon_discount_amount', 0);
             }
 
-            $orderTotal = Cart::instance('cart')->rawTotal() - $promotionDiscountAmount - $couponDiscountAmount;
+            $orderTotal = Session::get('price_without_symbol') - $promotionDiscountAmount - $couponDiscountAmount;
             $orderTotal = max($orderTotal, 0);
 
             $shipping = [];
@@ -185,7 +185,7 @@ class HandleCheckoutOrderData
         $applyDiscountBeforeTaxes = get_ecommerce_setting('checkout_apply_discount_before_taxes', false);
         $cartInstance = Cart::instance('cart');
 
-        $rawTotal = $applyDiscountBeforeTaxes ? $cartInstance->rawSubTotal() : $cartInstance->rawTotal();
+        $rawTotal = $applyDiscountBeforeTaxes ? Session::get('price_without_symbol') : Session::get('price_without_symbol');
         $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
         $orderAmount += (float) $shippingAmount;
 

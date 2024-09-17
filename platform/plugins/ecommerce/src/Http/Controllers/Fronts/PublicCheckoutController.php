@@ -48,6 +48,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Session;
 use Throwable;
 
 class PublicCheckoutController extends BaseController
@@ -194,7 +195,7 @@ class PublicCheckoutController extends BaseController
 
         $discounts = apply_filters('ecommerce_checkout_discounts_query', $discountsQuery, $products)->get();
 
-        $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $checkoutOrderData->rawTotal, 'orderAmount' => $checkoutOrderData->orderAmount];
+        $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $checkoutOrderData->rawTotal, 'orderAmount' => Session::get('price_without_symbol')];
 
         app(GoogleTagManager::class)->beginCheckout($products->all(), $checkoutOrderData->orderAmount);
         app(FacebookPixel::class)->checkout($products->all(), $checkoutOrderData->orderAmount);
@@ -563,7 +564,8 @@ class PublicCheckoutController extends BaseController
         $totalQuality = Cart::instance('cart')->rawTotalQuantity();
 
         if (($minimumQuantity = EcommerceHelper::getMinimumOrderQuantity()) > 0
-            && $totalQuality < $minimumQuantity) {
+            && $totalQuality < $minimumQuantity
+        ) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -576,7 +578,8 @@ class PublicCheckoutController extends BaseController
         }
 
         if (($maximumQuantity = EcommerceHelper::getMaximumOrderQuantity()) > 0
-            && $totalQuality > $maximumQuantity) {
+            && $totalQuality > $maximumQuantity
+        ) {
             return $this
                 ->httpResponse()
                 ->setError()

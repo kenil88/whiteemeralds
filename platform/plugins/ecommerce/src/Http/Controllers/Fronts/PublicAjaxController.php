@@ -113,10 +113,14 @@ class PublicAjaxController extends BaseController
         $diamond_type = '';
         $gold_purity = '';
         $default_size = 13; // Reference size
-        // dd($request['options']);
+        $selected_size = $default_size; // Initialize selected size
         foreach ($request['options'] as $product_option_id => $value) {
             // Fetch options related to the product
-
+            if (is_array($value) && isset($value['values'])) {
+                $value = $value['values'];
+            } elseif (is_string($value)) {
+                $value = $value;
+            }
 
             $option_query = Option::select(
                 'ec_option_value.id as opv_id',
@@ -146,7 +150,6 @@ class PublicAjaxController extends BaseController
                         $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
 
                     }
-
                     // Check if the selected option is 14K or 18K gold
                     if ($value == '14K' && $option_value == '14K') {
                         $gold_weight = $weight;  // Set weight for 14k gold
@@ -158,23 +161,28 @@ class PublicAjaxController extends BaseController
 
                     if (is_numeric($value)) {
                         $selected_size = (int) $value;
-                        $size_difference = $selected_size - $default_size; // Calculate the size difference
-
-                        // Adjust gold weight by 0.150 for each size difference
-                        $weight_change = abs($size_difference) * 0.150;
-
-                        if ($size_difference > 0) {
-                            // Size increased, increase gold weight
-                            $gold_weight += $weight_change;
-                        } elseif ($size_difference < 0) {
-                            // Size decreased, decrease gold weight
-                            $gold_weight -= $weight_change;
-                        }
                     }
                 }
             }
         }
 
+
+        $size_difference = $selected_size - $default_size; // Calculate the size difference
+
+        // Adjust gold weight by 0.150 for each size difference
+        $weight_change = abs($size_difference) * 0.150;
+
+
+
+        // dd($size_difference);
+        if ($size_difference > 0) {
+            // Size increased, increase gold weight
+            $gold_weight += $weight_change;
+        } elseif ($size_difference < 0) {
+            // Size decreased, decrease gold weight
+            $gold_weight -= $weight_change;
+            // dd($weight_change, $size_difference, $gold_weight);
+        }
         // Calculate price based on selected options
         // $diamond_price = 0;
         if ($diamond_type == 'natural') {

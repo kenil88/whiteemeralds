@@ -51,7 +51,7 @@ class CheckoutForm extends FormAbstract
                                         'right_column_logo_wrapper',
                                         '<div class="d-block d-sm-none">',
                                         '</div>',
-                                        fn (CheckoutForm $form) => $form->add(
+                                        fn(CheckoutForm $form) => $form->add(
                                             'right_column_logo',
                                             HtmlField::class,
                                             HtmlFieldOption::make()->content(view('plugins/ecommerce::orders.partials.logo'))
@@ -61,7 +61,7 @@ class CheckoutForm extends FormAbstract
                                         'right_column_cart_item_wrapper',
                                         '<div class="my-3 bg-light"><div class="position-relative p-3" id="cart-item">',
                                         '</div></div>',
-                                        fn (CheckoutForm $form) => $form->add(
+                                        fn(CheckoutForm $form) => $form->add(
                                             'right_column_cart_item',
                                             HtmlField::class,
                                             HtmlFieldOption::make()->content(view('plugins/ecommerce::orders.partials.amount', $model))
@@ -71,7 +71,7 @@ class CheckoutForm extends FormAbstract
                                         'right_column_discount_wrapper',
                                         '<div class="mt-3 mb-5">',
                                         '</div>',
-                                        fn (CheckoutForm $form) => $form->add(
+                                        fn(CheckoutForm $form) => $form->add(
                                             'right_column_discount',
                                             HtmlField::class,
                                             HtmlFieldOption::make()->content(view(EcommerceHelper::viewPath('discounts.partials.form'), ['discounts' => $model['discounts']]))
@@ -89,7 +89,7 @@ class CheckoutForm extends FormAbstract
                                         'left_column_logo_wrapper',
                                         '<div class="d-none d-sm-block">',
                                         '</div>',
-                                        fn (CheckoutForm $form) => $form->add(
+                                        fn(CheckoutForm $form) => $form->add(
                                             'left_column_logo',
                                             HtmlField::class,
                                             HtmlFieldOption::make()->content(view('plugins/ecommerce::orders.partials.logo'))

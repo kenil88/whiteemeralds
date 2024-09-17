@@ -3,15 +3,15 @@
         <div class="d-flex flex-column gap-2 cartmini__checkout-title mb-30">
             <div>
                 <h4>{{ __('Subtotal:') }}</h4>
-                <span>{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
+                <span>{{ format_price(round(Cart::instance('cart')->rawSubTotal())) }}</span>
             </div>
             @if (EcommerceHelper::isTaxEnabled())
-                <div>
+                {{-- <div>
                     <h4>{{ __('Tax:') }}</h4>
                     <span>{{ format_price(Cart::instance('cart')->rawTax()) }}</span>
-                </div>
+                </div> --}}
                 <div>
-                    @php
+                    {{-- @php
                     $originalProducts = Cart::instance('cart')->products();
                     $totalMakingCharges = 0;
                     @endphp
@@ -54,7 +54,7 @@
                     @else
                     <span>{{ format_price($certificate_charge) }}</span>
                     @endif
-                </div>
+                </div> --}}
                 <div>
                     <h4>{{ __('Total:') }}</h4>
                     <span>{{ format_price(Cart::instance('cart')->rawSubTotal() + Cart::instance('cart')->rawTax()) }}</span>

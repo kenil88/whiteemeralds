@@ -20,6 +20,7 @@ use Botble\Theme\Facades\Theme;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Throwable;
 
 class PublicCartController extends BaseController
@@ -27,8 +28,7 @@ class PublicCartController extends BaseController
     public function __construct(
         protected HandleApplyPromotionsService $applyPromotionsService,
         protected HandleApplyCouponService $handleApplyCouponService
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -63,6 +63,8 @@ class PublicCartController extends BaseController
     public function store(CartRequest $request)
     {
         $response = $this->httpResponse();
+
+        Session::put('product_price', $request->input('product_price'));
 
         $product = Product::query()->find($request->input('id'));
 
@@ -161,7 +163,7 @@ class PublicCartController extends BaseController
 
         $cartItems = OrderHelper::handleAddCart($product, $request);
 
-        $cartItem = Arr::first(array_filter($cartItems, fn ($item) => $item['id'] == $product->id));
+        $cartItem = Arr::first(array_filter($cartItems, fn($item) => $item['id'] == $product->id));
 
         $response->setMessage(__(
             'Added product :product to cart successfully!',
