@@ -19,7 +19,7 @@
                             </h5>
                             @include(Theme::getThemeNamespace('views.ecommerce.includes.cart-quantity'))
                             <div class="cartmini__price-wrapper">
-                            @include(EcommerceHelper::viewPath('includes.product-price'), [
+                            @include(EcommerceHelper::viewPath('includes.product-price-cart'), [
                                 'priceWrapperClassName' => 'cartmini__price',
                                 'priceClassName' => '',
                                 'priceOriginalWrapperClassName' => '',

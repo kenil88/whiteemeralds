@@ -57,7 +57,7 @@
                 </div> --}}
                 <div>
                     <h4>{{ __('Total:') }}</h4>
-                    <span>{{ format_price(Cart::instance('cart')->rawSubTotal() + Cart::instance('cart')->rawTax()) }}</span>
+                    <span>{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
                 </div>
             @endif
         </div>
