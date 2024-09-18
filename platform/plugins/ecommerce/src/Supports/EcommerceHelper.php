@@ -1342,6 +1342,10 @@ class EcommerceHelper
             ->container('footer')
             ->add('front-ecommerce-js', 'vendor/core/plugins/ecommerce/js/front-ecommerce.js', ['jquery', 'lightgallery-js', 'slick-js'], version: $version);
 
+        Theme::asset()
+            ->container('footer')
+            ->add('mindar-face.js', 'https://cdn.jsdelivr.net/npm/@mindar-js/three@latest/dist/mindar-face.js');
+
         $currency = get_application_currency();
 
         $currencyData = Js::from([

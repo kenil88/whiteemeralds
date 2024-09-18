@@ -82,6 +82,7 @@ class PublicAjaxController extends BaseController
             $json['total_price_with_tax'] = format_price(round($ret['total']));
             $json['diamond_name'] = $ret['diamond_name'];
             $json['diamond_weight'] = $ret['diamond_weight'];
+            $json['diamond_type'] = $ret['diamond_type'];
             // $json['total_price_without_tax'] = $this->currency->format($ret['total'], $this->session->data['currency']);
             // $json['current_theme'] = $this->config->get('theme_default_directory');
 
@@ -94,6 +95,11 @@ class PublicAjaxController extends BaseController
         $product_id = $request['product_id'];
 
         $product_info = Product::select('length', 'wide', 'height', 'tax_id')->where('id', $product_id)->first();
+
+        $get_cat_id = DB::table('ec_product_category_product')
+            ->selectRaw('category_id')
+            ->where('product_id', $product_id)
+            ->first();
 
         $tax_info = Tax::where('id', $product_info->tax_id)->first();
 
@@ -112,8 +118,15 @@ class PublicAjaxController extends BaseController
         $diamond_weight = 0;
         $diamond_type = '';
         $gold_purity = '';
-        $default_size = 13; // Reference size
-        $selected_size = $default_size; // Initialize selected size
+
+        if ($get_cat_id->category_id == 25) {
+            $default_size = 13; // Reference size
+            $selected_size = $default_size; // Initialize selected size
+        } elseif ($get_cat_id->category_id == 24) {
+            $default_size = 20; // Reference size
+            $selected_size = $default_size; // Initialize selected size
+        }
+
         foreach ($request['options'] as $product_option_id => $value) {
             // Fetch options related to the product
             if (is_array($value) && isset($value['values'])) {
@@ -172,8 +185,6 @@ class PublicAjaxController extends BaseController
         // Adjust gold weight by 0.150 for each size difference
         $weight_change = abs($size_difference) * 0.150;
 
-
-
         // dd($size_difference);
         if ($size_difference > 0) {
             // Size increased, increase gold weight
@@ -181,26 +192,33 @@ class PublicAjaxController extends BaseController
         } elseif ($size_difference < 0) {
             // Size decreased, decrease gold weight
             $gold_weight -= $weight_change;
-            // dd($weight_change, $size_difference, $gold_weight);
         }
         // Calculate price based on selected options
         // $diamond_price = 0;
         if ($diamond_type == 'natural') {
             $diamond_price = $diamond_price;
             $diamond_name = 'Natural Diamond';
+            $diamond_final_type = 'EF Vvs';
         }
 
         if ($diamond_type == 'labgrown') {
             $diamond_name = 'Lab Grown Diamond';
             $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
+            $diamond_final_type = 'EF Vvs / VS';
         }
         $gold_price = 0;
         if ($metal_purity == '14k') {
-            // $gold_price = $gold_weight * $gold_price_14k_per_gram;
-            $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
+            if ($get_cat_id->category_id == 25) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.14K'); // Example price for 14k gold (per gram)
+            } elseif ($get_cat_id->category_id == 24) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.14K'); // Example price for 14k gold (per gram)
+            }
         } elseif ($metal_purity == '18k') {
-            // $gold_price = $gold_weight * $gold_price_18k_per_gram;
-            $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
+            if ($get_cat_id->category_id == 25) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.18K'); // Example price for 18k gold (per gram)
+            } elseif ($get_cat_id->category_id == 24) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.18K'); // Example price for 18k gold (per gram)
+            }
         }
 
 
@@ -260,6 +278,8 @@ class PublicAjaxController extends BaseController
                 'price' => round($price),
 
                 'total' => round($total_price_with_tax) * $qty,
+
+                'diamond_type' => $diamond_final_type
             ];
         return $arr;
     }

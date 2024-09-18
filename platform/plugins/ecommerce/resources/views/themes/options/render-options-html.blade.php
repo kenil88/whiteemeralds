@@ -1,9 +1,9 @@
-@if ($displayBasePrice && $basePrice != null)
+{{-- @if ($displayBasePrice && $basePrice != null)
     <div class="small d-flex justify-content-between">
         <span>{{ trans('plugins/ecommerce::product-option.price') }}:</span>
         <strong>{{ format_price($basePrice) }}</strong>
     </div>
-@endif
+@endif --}}
 
 @foreach ($productOptions['optionCartValue'] as $key => $optionValue)
     @php

@@ -71,9 +71,136 @@
             </div>
         </div>
     @endif
+<style>
 
+    </style>
     {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null, $product) !!}
 
+    @php
+        $product->image;
+    @endphp
+    {{-- <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+	const list = ["earring"];
+	const visibles = [true, false, false, true, true];
+	const setVisible = (button, entities, visible) => {
+	  if (visible) {
+	    button.classList.add("selected");
+	  } else {
+	    button.classList.remove("selected");
+	  }
+	  entities.forEach((entity) => {
+	    entity.setAttribute("visible", visible);
+	  });
+	}
+	list.forEach((item, index) => {
+	  const button = document.querySelector("#" + item);
+	  const entities = document.querySelectorAll("." + item + "-entity");
+	  setVisible(button, entities, visibles[index]);
+	  button.addEventListener('click', () => {
+	    visibles[index] = !visibles[index];
+	    setVisible(button, entities, visibles[index]);
+	  });
+	});
+      })
+    </script> --}}
+    
+     {{-- {{ RvMedia::image($product->image, $product->name) }} --}}
+     {{-- <div id="popup">
+        <div id="popupContent">
+            <span id="closePopup">&times;</span>
+            <div class="example-container">
+                <div class="options-panel">
+	
+	<img id="earring" src="{{ RvMedia::image($product->image, $product->name) }}"/>
+      </div>
+      <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        <a-assets>
+          <a-asset-item id="earringModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/earring/scene.gltf"></a-asset-item>
+        </a-assets>
+        <a-camera active="false" position="0 0 0"></a-camera>
+	<!-- head occluder -->
+       
+        <a-entity mindar-face-target="anchorIndex: 127">
+	  <a-gltf-model rotation="-0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
+        </a-entity>
+        <a-entity mindar-face-target="anchorIndex: 356">
+	  <a-gltf-model rotation="0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
+        </a-entity>
+      </a-scene>
+            </div>
+        </div>
+    </div> --}}
+
+            {{-- <a id="tryNowBtn">Try Now</a> --}}
+<style>
+        .example-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+        .options-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+        .options-panel img {
+            width: 100px; /* Adjust size as needed */
+        }
+        #popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            overflow: auto;
+        }
+        #popupContent {
+            position: relative;
+            margin: auto;
+            width: 80%;
+            max-width: 800px;
+            height: 80%;
+        }
+        #popupContent a-scene {
+            width: 100%;
+            height: 100%;
+        }
+        #closePopup {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 40px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+    {{-- <script>
+        // Show the popup
+        document.getElementById('tryNowBtn').onclick = function() {
+            document.getElementById('popup').style.display = 'block';
+        };
+
+        // Hide the popup
+        document.getElementById('closePopup').onclick = function() {
+            document.getElementById('popup').style.display = 'none';
+        };
+
+        // Close the popup when clicking outside of the content
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('popup')) {
+                document.getElementById('popup').style.display = 'none';
+            }
+        };
+    </script> --}}
+    
     @if (EcommerceHelper::isCartEnabled())
         @php
             $isOutOfStock = $product->isOutOfStock();
@@ -110,6 +237,7 @@
                     </button>
                 </div>
             </div>
+           
             @if (EcommerceHelper::isQuickBuyButtonEnabled())
                 <button
                     type="submit"
@@ -119,6 +247,8 @@
                     {!! EcommerceHelper::jsAttributes('buy-now-in-form', $product) !!}
                 >{{ __('Buy Now') }}</button>
             @endif
+            
+             
         </div>
     @endif
 

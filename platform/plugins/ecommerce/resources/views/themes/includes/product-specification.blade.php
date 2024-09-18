@@ -60,8 +60,7 @@
     <tbody>
         <tr>
             <td>Diamond Type</td>
-            <td id="DiamondType">VVS EF
-            </td>
+            <td id="DiamondType"></td>
         </tr>
         <tr>
             <td>Total No of Diamonds</td>

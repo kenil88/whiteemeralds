@@ -67,7 +67,7 @@
                                                 </div>
                                             </td>
                                             <td class="tp-cart-price" data-title="{{ __('Price') }}">
-                                                @include(EcommerceHelper::viewPath('includes.product-price'), [
+                                                @include(EcommerceHelper::viewPath('includes.product-price-cart'), [
                                                     'priceWrapperClassName' => '',
                                                     'priceClassName' => '',
                                                     'priceOriginalWrapperClassName' => '',
