@@ -34,7 +34,7 @@
                         data-extra-price="{{ $price }}"
                         value="{{ $value->option_value }}"
                         {{-- Set default selected value for 'ladies ring' as 13 and 'gents ring' as 20 --}}
-                        {{ (strtolower($product->categories[0]->name) == 'ladies ring' && $value->option_value == 13) || (strtolower($product->categories[0]->name) == 'gents ring' && $value->option_value == 20) ? 'selected' : '' }}
+                        {{ strtolower($product->categories[0]->name) == 'gents ring' ? ($value->option_value == 20 ? 'selected' : '') : ($value->option_value == 13 ? 'selected' : '') }}
                     >{{ $value->option_value }} {{ $price > 0 ? '+' . format_price($price) : '' }}</option>
                 @endforeach
             </select>

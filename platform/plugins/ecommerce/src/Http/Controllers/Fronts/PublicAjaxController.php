@@ -83,6 +83,7 @@ class PublicAjaxController extends BaseController
             $json['diamond_name'] = $ret['diamond_name'];
             $json['diamond_weight'] = $ret['diamond_weight'];
             $json['diamond_type'] = $ret['diamond_type'];
+            $json['diamond_qty'] = $ret['diamond_qty'];
             // $json['total_price_without_tax'] = $this->currency->format($ret['total'], $this->session->data['currency']);
             // $json['current_theme'] = $this->config->get('theme_default_directory');
 
@@ -94,7 +95,7 @@ class PublicAjaxController extends BaseController
     {
         $product_id = $request['product_id'];
 
-        $product_info = Product::select('length', 'wide', 'height', 'tax_id')->where('id', $product_id)->first();
+        $product_info = Product::select('length', 'wide', 'height', 'tax_id', 'diamond_qty')->where('id', $product_id)->first();
 
         $get_cat_id = DB::table('ec_product_category_product')
             ->selectRaw('category_id')
@@ -118,12 +119,10 @@ class PublicAjaxController extends BaseController
         $diamond_weight = 0;
         $diamond_type = '';
         $gold_purity = '';
-
+        $selected_size = 0;
+        $default_size = 13;
         if ($get_cat_id->category_id == 25) {
             $default_size = 13; // Reference size
-            $selected_size = $default_size; // Initialize selected size
-        } elseif ($get_cat_id->category_id == 24) {
-            $default_size = 20; // Reference size
             $selected_size = $default_size; // Initialize selected size
         }
 
@@ -178,20 +177,34 @@ class PublicAjaxController extends BaseController
                 }
             }
         }
+        // category id = 25 is for ladies
+        // category id = 24 is for gentes
+        if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
+            $size_difference = $selected_size - $default_size; // Calculate the size difference
 
+            // Adjust gold weight by 0.150 for each size difference
+            $weight_change = abs($size_difference) * 0.150;
 
-        $size_difference = $selected_size - $default_size; // Calculate the size difference
+            if ($size_difference > 0) {
+                // Size increased, increase gold weight
+                $gold_weight += $weight_change;
+            } elseif ($size_difference < 0) {
+                // Size decreased, decrease gold weight
+                $gold_weight -= $weight_change;
+            }
+        } elseif ($get_cat_id->category_id == 25) {
+            $size_difference = $selected_size - $default_size; // Calculate the size difference
 
-        // Adjust gold weight by 0.150 for each size difference
-        $weight_change = abs($size_difference) * 0.150;
+            // Adjust gold weight by 0.250 for each size difference
+            $weight_change = abs($size_difference) * 0.250;
 
-        // dd($size_difference);
-        if ($size_difference > 0) {
-            // Size increased, increase gold weight
-            $gold_weight += $weight_change;
-        } elseif ($size_difference < 0) {
-            // Size decreased, decrease gold weight
-            $gold_weight -= $weight_change;
+            if ($size_difference > 0) {
+                // Size increased, increase gold weight
+                $gold_weight += $weight_change;
+            } elseif ($size_difference < 0) {
+                // Size decreased, decrease gold weight
+                $gold_weight -= $weight_change;
+            }
         }
         // Calculate price based on selected options
         // $diamond_price = 0;
@@ -279,7 +292,9 @@ class PublicAjaxController extends BaseController
 
                 'total' => round($total_price_with_tax) * $qty,
 
-                'diamond_type' => $diamond_final_type
+                'diamond_type' => $diamond_final_type,
+
+                'diamond_qty' => $product_info->diamond_qty
             ];
         return $arr;
     }

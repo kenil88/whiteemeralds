@@ -64,12 +64,12 @@
         </tr>
         <tr>
             <td>Total No of Diamonds</td>
-            <td id="TotalNoofDiamonds">34 pcs
+            <td id="TotalNoofDiamonds">
             </td>
         </tr>
         <tr>
             <td>Diamond Weight</td>
-            <td id="DiamondWeight">0.306 ct
+            <td id="DiamondWeight">
             </td>
         </tr>
     </tbody>
