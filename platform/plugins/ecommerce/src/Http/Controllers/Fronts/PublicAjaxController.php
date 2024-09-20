@@ -73,7 +73,7 @@ class PublicAjaxController extends BaseController
             $json['gold_price'] = format_price($ret['gold_price']);
             $json['diamond_price'] = format_price($ret['diamond_price']);
             // $json['black_diamond_price'] = $this->currency->format($ret['black_diamond_price'], $this->session->data['currency']);
-            // $json['gemstone_price'] = $this->currency->format($ret['gemstone_price'], $this->session->data['currency']);
+            $json['gemstone_price'] = format_price($ret['gemstone_price']);
             $json['certificate_charges'] = format_price($ret['certificate_charges']);
             $json['making_charges'] = format_price($ret['making_charges']);
             $json['product_price'] = format_price($ret['original_price']);
@@ -84,6 +84,9 @@ class PublicAjaxController extends BaseController
             $json['diamond_weight'] = $ret['diamond_weight'];
             $json['diamond_type'] = $ret['diamond_type'];
             $json['diamond_qty'] = $ret['diamond_qty'];
+            $json['stone_type'] = $ret['stone_type'];
+            $json['no_of_stone'] = $ret['no_of_stone'];
+            $json['stone_weight'] = $ret['stone_weight'];
             // $json['total_price_without_tax'] = $this->currency->format($ret['total'], $this->session->data['currency']);
             // $json['current_theme'] = $this->config->get('theme_default_directory');
 
@@ -95,7 +98,7 @@ class PublicAjaxController extends BaseController
     {
         $product_id = $request['product_id'];
 
-        $product_info = Product::select('length', 'wide', 'height', 'tax_id', 'diamond_qty')->where('id', $product_id)->first();
+        $product_info = Product::select('length', 'wide', 'height', 'tax_id', 'diamond_qty', 'gemstone_qty')->where('id', $product_id)->first();
 
         $get_cat_id = DB::table('ec_product_category_product')
             ->selectRaw('category_id')
@@ -118,9 +121,11 @@ class PublicAjaxController extends BaseController
         $gold_weight = 0;
         $diamond_weight = 0;
         $diamond_type = '';
+        $diamond_name = '';
         $gold_purity = '';
         $selected_size = 0;
         $default_size = 13;
+        $diamond_final_type = '';
         if ($get_cat_id->category_id == 25) {
             $default_size = 13; // Reference size
             $selected_size = $default_size; // Initialize selected size
@@ -151,16 +156,20 @@ class PublicAjaxController extends BaseController
                     $weight = $option['weight'];
 
                     // Check if the selected option is Natural or Lab-grown Diamond
-                    if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
-                        $diamond_price = $option['affect_price'];  // Set weight for natural diamond
-                        $diamond_type = 'natural';  // Mark diamond type as natural
+                    if ($option['name'] == 'Diamond') {
+                        if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
+                            $diamond_price = $option['affect_price'];  // Set weight for natural diamond
+                            $diamond_type = 'natural';  // Mark diamond type as natural
+                        }
 
-                    }
-
-                    if ($value == 'Lab Grown Diamond' && $option_value == 'Lab Grown Diamond') {
-                        $diamond_weight = $weight;  // Set weight for lab-grown diamond
-                        $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
-
+                        if ($value == 'Lab Grown Diamond' && $option_value == 'Lab Grown Diamond') {
+                            $diamond_weight = $weight;  // Set weight for lab-grown diamond
+                            $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
+                        }
+                    } elseif ($option['name'] == 'Gem Stone') {
+                        $gemstone_price = $option['affect_price'];
+                        $stone_type = $option['option_value'];
+                        $stone_weight = $option['weight'];
                     }
                     // Check if the selected option is 14K or 18K gold
                     if ($value == '14K' && $option_value == '14K') {
@@ -207,33 +216,50 @@ class PublicAjaxController extends BaseController
             }
         }
         // Calculate price based on selected options
-        // $diamond_price = 0;
+        $diamond_price = 0;
         if ($diamond_type == 'natural') {
             $diamond_price = $diamond_price;
             $diamond_name = 'Natural Diamond';
             $diamond_final_type = 'EF Vvs';
         }
-
         if ($diamond_type == 'labgrown') {
             $diamond_name = 'Lab Grown Diamond';
             $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
             $diamond_final_type = 'EF Vvs / VS';
         }
+
+        $gemstone_price = $gemstone_price;
+
+        $stone_type = $stone_type;
+
+        $stone_weight = $stone_weight;
+
         $gold_price = 0;
         if ($metal_purity == '14k') {
-            if ($get_cat_id->category_id == 25) {
+            if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.14K'); // Example price for 14k gold (per gram)
-            } elseif ($get_cat_id->category_id == 24) {
+            } elseif ($get_cat_id->category_id == 25) {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.14K'); // Example price for 14k gold (per gram)
+            } else {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
             }
         } elseif ($metal_purity == '18k') {
-            if ($get_cat_id->category_id == 25) {
+            if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.18K'); // Example price for 18k gold (per gram)
-            } elseif ($get_cat_id->category_id == 24) {
+            } elseif ($get_cat_id->category_id == 25) {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.18K'); // Example price for 18k gold (per gram)
+            } else {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
+            }
+        } elseif ($metal_purity == '10k') {
+            if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.10K'); // Example price for 10k gold (per gram)
+            } elseif ($get_cat_id->category_id == 25) {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.10K'); // Example price for 10k gold (per gram)
+            } else {
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.10K'); // Example price for 10k gold (per gram)
             }
         }
-
 
         $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
 
@@ -249,7 +275,7 @@ class PublicAjaxController extends BaseController
 
         $price = round($gold_price, 2);
 
-        $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
+        $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
         $tax = $final_price * $tax_info->percentage / 100;
 
@@ -280,11 +306,7 @@ class PublicAjaxController extends BaseController
 
                 'making_charges' => $making_charges,
 
-                // 'option_weight' => $option_weight,
-
                 'original_price' => $price,
-
-                // 'option_price' => $option_price,
 
                 'tax' => $tax,
 
@@ -294,7 +316,13 @@ class PublicAjaxController extends BaseController
 
                 'diamond_type' => $diamond_final_type,
 
-                'diamond_qty' => $product_info->diamond_qty
+                'diamond_qty' => $product_info->diamond_qty,
+
+                'stone_type' => $stone_type,
+
+                'no_of_stone' => $product_info->gemstone_qty,
+
+                'stone_weight' => $stone_weight
             ];
         return $arr;
     }

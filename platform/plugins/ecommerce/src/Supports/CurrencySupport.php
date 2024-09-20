@@ -80,7 +80,7 @@ class CurrencySupport
             $this->currencies();
         }
 
-        // $userIPAddress = $this->getUseIpAddress();
+        $userIPAddress = $this->getUseIpAddress();
 
         if (session('currency')) {
             $currency = $this->currencies->where('title', session('currency'))->first();
@@ -88,21 +88,21 @@ class CurrencySupport
             $currency = $this->currencies->where('title', $this->detectedCurrencyCode())->first();
         }
 
-        // if (!empty($userIPAddress) && $userIPAddress['country_code'] == 'IN') {
-        //     $currency = $this->currencies->where('title', 'INR')->first();
-        // } else {
-        //     $currency = $this->currencies->where('title', 'USD')->first();
+        if (!empty($userIPAddress) && $userIPAddress['country_code'] == 'IN') {
+            $currency = $this->currencies->where('title', 'INR')->first();
+        } else {
+            $currency = $this->currencies->where('title', 'USD')->first();
+        }
+
+        // if (! $currency) {
+        //     $currency = $this->getDefaultCurrency();
         // }
 
-        if (! $currency) {
-            $currency = $this->getDefaultCurrency();
-        }
+        // if (! $currency->is_default) {
+        //     $this->currency = $this->setCurrencyExchangeRate($currency);
+        // }
 
-        if (! $currency->is_default) {
-            $this->currency = $this->setCurrencyExchangeRate($currency);
-        }
-
-        // session(['currency_data' => $currency->title]);
+        session(['currency_data' => $currency->title]);
         return $currency;
     }
 

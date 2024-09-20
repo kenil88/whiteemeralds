@@ -52,12 +52,12 @@
             <td id="Length"></td>
         </tr>
     </tbody>
-    <thead>
+    <thead id="DiamondNameRow">
         <tr>
             <td colspan="2"><strong id="DiamondName"></strong></td>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="DiamondTypeRow">
         <tr>
             <td>Diamond Type</td>
             <td id="DiamondType"></td>
@@ -70,6 +70,27 @@
         <tr>
             <td>Diamond Weight</td>
             <td id="DiamondWeight">
+            </td>
+        </tr>
+    </tbody>
+    <thead id="DiamondNameRow">
+        <tr>
+            <td colspan="2"><strong id="DiamondName">Gemstone Details</strong></td>
+        </tr>
+    </thead>
+    <tbody id="DiamondTypeRow">
+        <tr>
+            <td>Gemstone Type</td>
+            <td id="StoneType"></td>
+        </tr>
+        <tr>
+            <td>Total No of Gemstones</td>
+            <td id="TotalNoofGemtones">
+            </td>
+        </tr>
+        <tr>
+            <td>Gemstone Weight [Approx]</td>
+            <td id="GemstoneWeight">
             </td>
         </tr>
     </tbody>
