@@ -49,5 +49,5 @@ return [
     'diamond_charges'    =>  [
         'labgrown'   =>  30000
     ],
-    'dollar_price'    => 85
+    'dollar_price'    => 83
 ];

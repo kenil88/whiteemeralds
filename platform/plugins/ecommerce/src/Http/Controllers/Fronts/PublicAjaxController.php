@@ -125,7 +125,10 @@ class PublicAjaxController extends BaseController
         $gold_purity = '';
         $selected_size = 0;
         $default_size = 13;
+        $stone_type = '';
+        $stone_weight = 0;
         $diamond_final_type = '';
+        $diamond_price = 0;
         if ($get_cat_id->category_id == 25) {
             $default_size = 13; // Reference size
             $selected_size = $default_size; // Initialize selected size
@@ -154,14 +157,15 @@ class PublicAjaxController extends BaseController
                 foreach ($option_query as $option) {
                     $option_value = trim($option['option_value']);
                     $weight = $option['weight'];
-
                     // Check if the selected option is Natural or Lab-grown Diamond
                     if ($option['name'] == 'Diamond') {
                         if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
                             $diamond_price = $option['affect_price'];  // Set weight for natural diamond
                             $diamond_type = 'natural';  // Mark diamond type as natural
                         }
-
+                        if ($option_value == 'Lab Grown Diamond') {
+                            $labgrown_weight = $option['weight'];
+                        }
                         if ($value == 'Lab Grown Diamond' && $option_value == 'Lab Grown Diamond') {
                             $diamond_weight = $weight;  // Set weight for lab-grown diamond
                             $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
@@ -216,10 +220,11 @@ class PublicAjaxController extends BaseController
             }
         }
         // Calculate price based on selected options
-        $diamond_price = 0;
+
         if ($diamond_type == 'natural') {
             $diamond_price = $diamond_price;
             $diamond_name = 'Natural Diamond';
+            $diamond_weight = $labgrown_weight;
             $diamond_final_type = 'EF Vvs';
         }
         if ($diamond_type == 'labgrown') {
@@ -227,6 +232,7 @@ class PublicAjaxController extends BaseController
             $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
             $diamond_final_type = 'EF Vvs / VS';
         }
+
 
         $gemstone_price = $gemstone_price;
 
@@ -237,25 +243,25 @@ class PublicAjaxController extends BaseController
         $gold_price = 0;
         if ($metal_purity == '14k') {
             if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.14K'); // Example price for 14k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
             } elseif ($get_cat_id->category_id == 25) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.14K'); // Example price for 14k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
             } else {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
             }
         } elseif ($metal_purity == '18k') {
             if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.18K'); // Example price for 18k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
             } elseif ($get_cat_id->category_id == 25) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.18K'); // Example price for 18k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
             } else {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
             }
         } elseif ($metal_purity == '10k') {
             if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.ledis_ring.10K'); // Example price for 10k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.10K'); // Example price for 10k gold (per gram)
             } elseif ($get_cat_id->category_id == 25) {
-                $gold_price = $gold_weight * config('plugins.ecommerce.general.gents_ring.10K'); // Example price for 10k gold (per gram)
+                $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.10K'); // Example price for 10k gold (per gram)
             } else {
                 $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.10K'); // Example price for 10k gold (per gram)
             }
