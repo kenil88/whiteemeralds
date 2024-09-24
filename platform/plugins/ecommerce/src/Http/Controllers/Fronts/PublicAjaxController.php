@@ -87,6 +87,8 @@ class PublicAjaxController extends BaseController
             $json['stone_type'] = $ret['stone_type'];
             $json['no_of_stone'] = $ret['no_of_stone'];
             $json['stone_weight'] = $ret['stone_weight'];
+            $json['thikness'] = $ret['thikness'];
+            $json['diameter'] = $ret['diameter'];
             // $json['total_price_without_tax'] = $this->currency->format($ret['total'], $this->session->data['currency']);
             // $json['current_theme'] = $this->config->get('theme_default_directory');
 
@@ -98,7 +100,7 @@ class PublicAjaxController extends BaseController
     {
         $product_id = $request['product_id'];
 
-        $product_info = Product::select('length', 'wide', 'height', 'tax_id', 'diamond_qty', 'gemstone_qty')->where('id', $product_id)->first();
+        $product_info = Product::select('length', 'wide', 'height', 'tax_id', 'diamond_qty', 'gemstone_qty', 'thikness', 'diameter')->where('id', $product_id)->first();
 
         $get_cat_id = DB::table('ec_product_category_product')
             ->selectRaw('category_id')
@@ -328,7 +330,11 @@ class PublicAjaxController extends BaseController
 
                 'no_of_stone' => $product_info->gemstone_qty,
 
-                'stone_weight' => $stone_weight
+                'stone_weight' => $stone_weight,
+
+                'diameter' => $product_info->diameter,
+
+                'thikness' => $product_info->thikness
             ];
         return $arr;
     }

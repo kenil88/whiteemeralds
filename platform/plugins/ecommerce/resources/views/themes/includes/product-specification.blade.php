@@ -43,13 +43,21 @@
             <td>Width</td>
             <td id="Width"></td>
         </tr>
-        <tr>
+        <tr id="HeightRow">
             <td>Height</td>
             <td id="Height"></td>
         </tr>
-        <tr>
+        <tr id="LengthRow">
             <td>Length</td>
             <td id="Length"></td>
+        </tr>
+        <tr id="ThiknessRow">
+            <td>Thikness</td>
+            <td id="Thikness"></td>
+        </tr>
+        <tr id="DiameterRow">
+            <td>Diameter</td>
+            <td id="Diameter"></td>
         </tr>
     </tbody>
     <thead id="DiamondNameRow">
@@ -73,12 +81,12 @@
             </td>
         </tr>
     </tbody>
-    <thead id="DiamondNameRow">
+    <thead id="GameStoneNameRow">
         <tr>
             <td colspan="2"><strong id="DiamondName">Gemstone Details</strong></td>
         </tr>
     </thead>
-    <tbody id="DiamondTypeRow">
+    <tbody id="newGameStoneNameRow">
         <tr>
             <td>Gemstone Type</td>
             <td id="StoneType"></td>
