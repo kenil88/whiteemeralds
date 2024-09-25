@@ -5,12 +5,11 @@
     // Use regex to capture either alphabetic currency codes (like USD) or symbols (like ₹)
     preg_match('/^[^\d]+/', $priceText, $matches);
     $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
-
     // Define the allowed purity options for each currency
     $allowedPurities = [];
-    if ($currency == '₹') {
+    if ($currency == '₹ ') {
         $allowedPurities = ['18k', '14k'];
-    } elseif ($currency == 'USD') {
+    } elseif ($currency == 'USD ') {
         $allowedPurities = ['14k', '10k'];
     }
 @endphp
@@ -62,21 +61,10 @@
                             type="radio" data-option-value={{ Str::slug($value->option_value)}}
                             value="{{ $value->option_value }}"
                             @if (isset($inputClass)) class="{{ $inputClass }}" @endif
-
-                            {{-- Check if it's the first valid option and set it as checked --}}
-                            {{-- @if (!$firstValidOptionSelected)
-                                checked
-                                @php
-                                    $firstValidOptionSelected = true;
-                                @endphp
-                            @endif --}}
                         >
                         
                         <label for="option-{{ $option->id }}-value-{{ Str::slug($value->option_value) }}" @if (isset($labelClass)) class="{{ $labelClass }}" @endif>
                             &nbsp;{{ $value->option_value }}
-                            {{-- @if ($price > 0)
-                                <strong class="extra-price">+ {{ format_price($price) }}</strong>
-                            @endif --}}
                         </label>
                     </div>
                 @endif

@@ -30,53 +30,119 @@ class ProductPrice
         return new static($product);
     }
 
+    public function getPriceCart($options, bool $includingTaxes = true): float
+    {
+        if ($this->product->categories[0]->parent_id == 35) {
+            if ($includingTaxes) {
+                $price = $this->product->front_sale_price_with_taxes != $this->product->price_with_taxes
+                    ? $this->product->front_sale_price_with_taxes
+                    : $this->product->price_with_taxes;
+            } else {
+                $price = $this->product->isOnSale() ? $this->product->front_sale_price : $this->product->price;
+            }
+
+            return $this->applyFilters('price', 'value', (float) $price);
+        } else {
+            $looseBraceletSize = null;
+            $diamondWeight = null;
+            $goldWeight = null;
+            $diamond_price = 0;
+            $gemstone_price = 0;
+            $stone_weight = '';
+            $stone_type = '';
+            $options = $options;
+            $total_price_with_tax = 0;
+            if ($options) {
+                foreach ($options['options']['optionInfo'] as $key => $info) {
+                    if ($info === "Loose Bracelet Size" && isset($options['options']['optionCartValue'][$key])) {
+                        $looseBraceletSize = $options['options']['optionCartValue'][$key][0]['option_value'];
+                    }
+
+                    if (($info === "Diamond" || $info === "Lab Grown Diamond" || $info === "Natural Diamond")
+                        && isset($options['options']['optionCartValue'][$key])
+                    ) {
+                        $diamond_option_value = $options['options']['optionCartValue'][$key][0]['option_value'];
+                        $diamondWeight = $options['options']['optionCartValue'][$key][0]['weight'];
+
+                        if ($diamond_option_value == 'Natural Diamond') {
+                            $diamond_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
+                        }
+                    }
+
+                    if (($info === "Metal Purity") && isset($options['options']['optionCartValue'][$key])) {
+                        $metal_purity = $options['options']['optionCartValue'][$key][0]['option_value'];
+                        $goldWeight = $options['options']['optionCartValue'][$key][0]['weight'];
+                    }
+
+                    if ($info === "Gem Stone") {
+                        $gemstone_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
+                        $stone_type = $options['options']['optionCartValue'][$key][0]['option_value'];
+                        $stone_weight = $options['options']['optionCartValue'][$key][0]['weight'];
+                    }
+                }
+
+                // Diamond Pricing Logic
+                if ($diamond_option_value == 'Lab Grown Diamond') {
+                    if (get_application_currency_id() == 4) {
+                        $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown');
+                    } else {
+                        $labgrown_diamond_price_per_carat = ($diamondWeight > '0.20')
+                            ? config('plugins.ecommerce.general.diamond_charges_USD.upto_20')
+                            : config('plugins.ecommerce.general.diamond_charges_USD.after_20');
+                    }
+                    $diamond_price = $diamondWeight * $labgrown_diamond_price_per_carat;
+                }
+
+                // Gold Pricing Logic
+                $gold_price = 0;
+                if ($metal_purity == '14K') {
+                    $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.14K');
+                } elseif ($metal_purity == '18K') {
+                    $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.18K');
+                } elseif ($metal_purity == '10K') {
+                    $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.10K');
+                }
+
+                if (get_application_currency_id() == 4) {
+                    $price = round($gold_price, 2);
+                    $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
+                    $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
+                    $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
+                    $tax = $final_price * 3 / 100;
+                    $total_price_with_tax = round($final_price + $tax);
+                } else {
+                    $price = round($gold_price / get_current_exchange_rate(), 2);
+                    $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                    $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                    $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
+                    $total_price_with_tax = round($final_price, 2);
+                }
+
+                if ($goldWeight <= 5) {
+                    $making_charges *= 5;
+                } else {
+                    $making_charges *= $goldWeight;
+                }
+            }
+
+
+            return $this->applyFilters('price', 'value', (float) $total_price_with_tax);
+        }
+    }
+
+    public function displayAsTextCart($options): string
+    {
+        if (get_application_currency_id() == 4) {
+            $priceText = format_price(round($this->getPriceCart($options)));
+        } else {
+            $priceText = format_price(round($this->getPriceCart($options), 2));
+        }
+
+        return $this->applyFilters('price', 'display_as_text', $priceText);
+    }
+
     public function getPrice(bool $includingTaxes = true): float
     {
-        // $lab_grown_price = config('plugins.ecommerce.general.diamond_charges.labgrown');
-
-        // $gold_weight = Option::select('ec_option_value.weight')->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')->where('ec_options.product_id', $this->product->id)->where('ec_option_value.option_value', '14K')->first();
-
-        // $diamond_weight = Option::select('ec_option_value.weight')->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')->where('ec_options.product_id', $this->product->id)->where('ec_option_value.option_value', 'Lab Grown Diamond')->first();
-
-        // $tax_info = Tax::where('id', 4)->first();
-        // $gold_price = 0;
-        // if ($gold_weight) {
-
-        //     $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
-        // }
-
-        // $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
-
-        // $making_charges = config('plugins.ecommerce.general.making_charge.India');
-
-        // if ($gold_weight) {
-        //     if ($gold_weight->weight <= 5) {
-
-        //         $making_charges *= 5;
-        //     } else {
-
-        //         $making_charges *= $gold_weight->weight;
-        //     }
-        // }
-
-        // $price = round($gold_price, 2);
-
-        // if (isset($lab_grown_price->weight) && $lab_grown_price->weight > 0) {
-
-        //     $diamond_price = $diamond_weight->weight * $lab_grown_price;
-        // } else {
-
-        //     $diamond_price = 0;
-        // }
-
-        // $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
-
-        // $tax = $final_price * $tax_info->percentage / 100;
-
-        // $total_price_with_tax = $tax + $final_price;
-
-        // return $this->applyFilters('price', 'value', (float) $total_price_with_tax);
-
         if ($includingTaxes) {
             $price = $this->product->front_sale_price_with_taxes != $this->product->price_with_taxes
                 ? $this->product->front_sale_price_with_taxes
@@ -91,26 +157,6 @@ class ProductPrice
     public function displayAsText(): string
     {
         $priceText = format_price(round($this->getPrice()));
-        return $this->applyFilters('price', 'display_as_text', $priceText);
-    }
-
-    public function getPriceCart(bool $includingTaxes = true): float
-    {
-        $total_price_with_tax = Session::get('product_price');
-
-        $numericAmount = filter_var(str_replace([',', '₹'], '', $total_price_with_tax), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-
-        // Convert to integer if you want to remove the decimals
-        $numericAmount = intval($numericAmount);
-
-        Session::put('price_without_symbol', $numericAmount);
-
-        return $this->applyFilters('price', 'value', (float) $numericAmount);
-    }
-
-    public function displayAsTextCart(): string
-    {
-        $priceText = format_price(round($this->getPriceCart()));
         return $this->applyFilters('price', 'display_as_text', $priceText);
     }
 

@@ -248,9 +248,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
             'select' => [
                 '*',
             ],
-            'with' => [
-
-            ],
+            'with' => [],
         ], $params);
 
         $filters = ['brands' => (array) $params['brand_id']];
@@ -395,7 +393,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         $this->model = $this->model
             ->distinct()
-            ->when(! isset($params['condition']['ec_products.status']), fn ($query) => $query->wherePublished())
+            ->when(! isset($params['condition']['ec_products.status']), fn($query) => $query->wherePublished())
             ->join(DB::raw('
                 (
                     SELECT DISTINCT
@@ -646,7 +644,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
             $attributesIsList = array_is_list($attributes);
 
             if ($attributesIsList) {
-                $attributes = array_map(fn ($attributeId) => (int) $attributeId, $attributes);
+                $attributes = array_map(fn($attributeId) => (int) $attributeId, $attributes);
             }
 
             if (! $attributesIsList) {

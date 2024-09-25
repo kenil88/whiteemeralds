@@ -332,16 +332,11 @@ class Cart
 
     public function rawSubTotal(): float
     {
-        if (Session::get('price_without_symbol')) {
+        $content = $this->getContent();
 
-            return Session::get('price_without_symbol');
-        } else {
-            $content = $this->getContent();
-
-            return $content->reduce(function ($subTotal, CartItem $cartItem) {
-                return $subTotal + ($cartItem->qty * $cartItem->price);
-            }, 0);
-        }
+        return $content->reduce(function ($subTotal, CartItem $cartItem) {
+            return $subTotal + ($cartItem->qty * $cartItem->price);
+        }, 0);
     }
 
     public function rawSubTotalByItems($content): float

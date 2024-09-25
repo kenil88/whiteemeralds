@@ -24,6 +24,7 @@
                                 'priceClassName' => '',
                                 'priceOriginalWrapperClassName' => '',
                                 'priceOriginalClassName' => 'small text-secondary text-decoration-line-through',
+                                'options'=>$cartItem->options
                             ])
 
                             </div>

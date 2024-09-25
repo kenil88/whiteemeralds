@@ -116,7 +116,7 @@ class PublicAjaxController extends BaseController
         $gemstone_price = 0;
 
         $natural_diamond_price_per_carat = 3000; // Example price for natural diamond (per carat)
-        $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown'); // Example price for lab-grown diamond (per carat)
+
         $gold_price_14k_per_gram = config('plugins.ecommerce.general.gold_price.14K'); // Example price for 14k gold (per gram)
         $gold_price_18k_per_gram = config('plugins.ecommerce.general.gold_price.18K'); // Example price for 18k gold (per gram)
 
@@ -184,6 +184,9 @@ class PublicAjaxController extends BaseController
                     } elseif ($value == '18K' && $option_value == '18K') {
                         $gold_weight = $weight;  // Set weight for 18k gold
                         $metal_purity = '18k';  // Mark gold purity as 18k
+                    } elseif ($value == '10K' && $option_value == '10K') {
+                        $gold_weight = $weight;  // Set weight for 18k gold
+                        $metal_purity = '10k';  // Mark gold purity as 18k
                     }
 
                     if (is_numeric($value)) {
@@ -231,10 +234,18 @@ class PublicAjaxController extends BaseController
         }
         if ($diamond_type == 'labgrown') {
             $diamond_name = 'Lab Grown Diamond';
+            if (get_application_currency_id() == 4) {
+                $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown'); // Example price for lab-grown diamond (per carat)
+            } else {
+                if ($diamond_weight > '0.20') {
+                    $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges_USD.upto_20'); // Example price for lab-grown diamond (per carat)
+                } else {
+                    $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges_USD.after_20'); // Example price for lab-grown diamond (per carat)
+                }
+            }
             $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
             $diamond_final_type = 'EF Vvs / VS';
         }
-
 
         $gemstone_price = $gemstone_price;
 
@@ -269,25 +280,40 @@ class PublicAjaxController extends BaseController
             }
         }
 
-        $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
+        if (get_application_currency_id() == 4) {
+            $price = round($gold_price, 2);
+            $gold_price = $gold_price;
+            $diamond_price = $diamond_price;
+            $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
+            $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
 
-        $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
+            $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
-        if ($gold_weight <= 5) {
+            $tax = $final_price * $tax_info->percentage / 100;
 
-            $making_charges *= 5;
+            $total_price_with_tax = $tax + $final_price;
+
+            $total_price_with_tax = round($total_price_with_tax, 2);
         } else {
+            $price = round($gold_price / get_current_exchange_rate(), 2);
+            $gold_price = round($gold_price / get_current_exchange_rate(), 2);
+            $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
+            $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
+            $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
 
-            $making_charges *= $gold_weight;
+            $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
+
+            $tax = 0;
+
+            $total_price_with_tax = $tax + $final_price;
+            $total_price_with_tax = round($total_price_with_tax, 2);
         }
 
-        $price = round($gold_price, 2);
-
-        $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
-
-        $tax = $final_price * $tax_info->percentage / 100;
-
-        $total_price_with_tax = $tax + $final_price;
+        if ($gold_weight <= 5) {
+            $making_charges *= 5;
+        } else {
+            $making_charges *= $gold_weight;
+        }
 
         // Output total price and individual prices for debugging
         $arr =
@@ -318,9 +344,9 @@ class PublicAjaxController extends BaseController
 
                 'tax' => $tax,
 
-                'price' => round($price),
+                'price' => $price,
 
-                'total' => round($total_price_with_tax) * $qty,
+                'total' => $total_price_with_tax * $qty,
 
                 'diamond_type' => $diamond_final_type,
 

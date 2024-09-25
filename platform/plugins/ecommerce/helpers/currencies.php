@@ -112,8 +112,7 @@ if (! function_exists('get_current_exchange_rate')) {
         } elseif (! $currency instanceof Currency) {
             $currency = Currency::query()->find($currency);
         }
-
-        if (! $currency->is_default && $currency->exchange_rate > 0) {
+        if ($currency->is_default && $currency->exchange_rate > 0) {
             return $currency->exchange_rate;
         }
 

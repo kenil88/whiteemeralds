@@ -63,9 +63,15 @@ class PublicCartController extends BaseController
     public function store(CartRequest $request)
     {
         $response = $this->httpResponse();
+        // Session::put('product_price', $request->input('product_price'));
+        $product_price = $request->input('product_price');
 
-        Session::put('product_price', $request->input('product_price'));
+        $numericAmount = filter_var(str_replace([',', '₹'], '', $product_price), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 
+        // Convert to integer if you want to remove the decimals
+        $numericAmount = intval($numericAmount);
+
+        $request->merge(['product_price' => $numericAmount]);
         $product = Product::query()->find($request->input('id'));
 
         if (! $product) {

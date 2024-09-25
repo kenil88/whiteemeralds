@@ -10,12 +10,5 @@
     <span
         class="{{ $priceClassName === null ? 'bb-product-price-text fw-bold' : $priceClassName }}"
         data-bb-value="product-price"
-    >{{ $product->price()->displayAsText() }}</span>
-    
-    {{-- @if ($isDisplayPriceOriginal && $product->isOnSale())
-        @include(EcommerceHelper::viewPath('includes.product-prices.original'), [
-            'priceWrapperClassName' => $priceOriginalWrapperClassName,
-            'priceClassName' => $priceOriginalClassName,
-        ])
-    @endif --}}
+    >0</span>
 </div>

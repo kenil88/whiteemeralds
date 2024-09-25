@@ -45,9 +45,11 @@
                                     {{ __('Description') }}
                                 </button> --}}
                                 {{-- @if (EcommerceHelper::isProductSpecificationEnabled() && $product->specificationAttributes->where('pivot.hidden', false)->isNotEmpty()) --}}
+                                @if($product->categories[0]->parent_id != 35)
                                     <button class="nav-link active" id="nav-specification-tab" data-bs-toggle="tab" data-bs-target="#nav-specification" type="button" role="tab" aria-controls="nav-specification" aria-selected="false">
                                         {{ __('Product Specification') }}
                                     </button>
+                                    @endif
                                 {{-- @endif --}}
                                 @if(EcommerceHelper::isReviewEnabled())
                                     <button class="nav-link" id="nav-review-tab" data-bs-toggle="tab" data-bs-target="#nav-review" type="button" role="tab" aria-controls="nav-review" aria-selected="false">
@@ -78,12 +80,14 @@
                                     {!! apply_filters(BASE_FILTER_PUBLIC_COMMENT_AREA, null, $product) !!}
                                 </div>
                             </div>
+                                @if($product->categories[0]->parent_id != 35)
                             {{-- @if (EcommerceHelper::isProductSpecificationEnabled() && $product->specificationAttributes->where('pivot.hidden', false)->isNotEmpty()) --}}
                                 <div class="tab-pane fade show active" id="nav-specification" role="tabpanel" aria-labelledby="nav-specification-tab" tabindex="0">
                                     <div class="tp-product-details-additional-info">
                                         @include(EcommerceHelper::viewPath('includes.product-specification'))
                                     </div>
                                 </div>
+                                @endif
                             {{-- @endif --}}
                             @if (EcommerceHelper::isReviewEnabled())
                                 <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab" tabindex="0">

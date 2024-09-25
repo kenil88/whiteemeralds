@@ -36,8 +36,7 @@ class HandleFrontPages
 
     public function __construct(
         protected ProductCrossSalePriceService $productCrossSalePriceService
-    ) {
-    }
+    ) {}
 
     public function handle(Slug|array $slug): array|Slug
     {

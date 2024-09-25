@@ -185,7 +185,7 @@ class HandleCheckoutOrderData
         $applyDiscountBeforeTaxes = get_ecommerce_setting('checkout_apply_discount_before_taxes', false);
         $cartInstance = Cart::instance('cart');
 
-        $rawTotal = $applyDiscountBeforeTaxes ? Session::get('price_without_symbol') : Session::get('price_without_symbol');
+        $rawTotal = $applyDiscountBeforeTaxes ? $cartInstance->rawSubTotal() : $cartInstance->rawTotal();
         $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
         $orderAmount += (float) $shippingAmount;
 

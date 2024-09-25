@@ -49,5 +49,9 @@ return [
     'diamond_charges'    =>  [
         'labgrown'   =>  30000
     ],
+    'diamond_charges_USD'    =>  [
+        'upto_20'   =>  150000,
+        'after_20'   =>  120000,
+    ],
     'dollar_price'    => 83
 ];
