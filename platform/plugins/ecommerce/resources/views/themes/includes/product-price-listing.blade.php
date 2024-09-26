@@ -10,5 +10,5 @@
     <span
         class="{{ $priceClassName === null ? 'bb-product-price-text fw-bold' : $priceClassName }}"
         data-bb-value="product-price"
-    >{{ $product->price()->displayAsText() }}</span>
+    >{{ $product->price()->displayAsTextProductListing() }}</span>
 </div>

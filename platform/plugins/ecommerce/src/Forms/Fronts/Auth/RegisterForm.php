@@ -11,6 +11,7 @@ use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\PasswordField;
 use Botble\Base\Forms\Fields\PhoneNumberField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Base\Forms\Fields\DatePickerField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\EmailFieldOption;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
@@ -36,7 +37,7 @@ class RegisterForm extends AuthForm
             ->description(__('Your personal data will be used to support your experience throughout this website, to manage access to your account.'))
             ->when(
                 theme_option('register_background'),
-                fn (AuthForm $form, string $background) => $form->banner($background)
+                fn(AuthForm $form, string $background) => $form->banner($background)
             )
             ->add(
                 'name',
@@ -64,7 +65,7 @@ class RegisterForm extends AuthForm
                 'phone',
                 PhoneNumberField::class,
                 TextFieldOption::make()
-                    ->label(__('Phone (optional)'))
+                    ->label(__('Phone'))
                     ->when(EcommerceHelper::isLoginUsingPhone() || get_ecommerce_setting('make_customer_phone_number_required', false), function (TextFieldOption $fieldOption) {
                         $fieldOption
                             ->required()
@@ -91,6 +92,24 @@ class RegisterForm extends AuthForm
                     ->label(__('Password confirmation'))
                     ->placeholder(__('Password confirmation'))
                     ->icon('ti ti-lock')
+                    ->toArray()
+            )
+            ->add(
+                'birthdate',
+                DatePickerField::class,
+                TextFieldOption::make()
+                    ->label(__('Birthdate'))
+                    ->placeholder(__('Birthdate'))
+                    ->icon('ti ti-calendar')
+                    ->toArray()
+            )
+            ->add(
+                'marriage_anniversary',
+                DatePickerField::class,
+                TextFieldOption::make()
+                    ->label(__('Marriage Anniversary'))
+                    ->placeholder(__('Marriage Anniversary'))
+                    ->icon('ti ti-calendar')
                     ->toArray()
             )
             ->add(

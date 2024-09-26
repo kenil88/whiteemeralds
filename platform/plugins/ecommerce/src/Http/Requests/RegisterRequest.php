@@ -28,6 +28,8 @@ class RegisterRequest extends Request
                 Rule::unique((new Customer())->getTable(), 'phone'),
             ],
             'password' => ['required', 'min:6', 'confirmed'],
+            'password' => ['required', 'min:6', 'confirmed'],
+            'password' => ['required', 'min:6', 'confirmed'],
             'agree_terms_and_policy' => ['sometimes', 'accepted:1'],
         ];
 
