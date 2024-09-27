@@ -182,9 +182,9 @@ class ProductPrice
             $tax_info = Tax::where('id', 4)->first();
             $gold_price = 0;
             if ($gold_weight) {
-
                 $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
             }
+
 
             $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
 
@@ -202,14 +202,13 @@ class ProductPrice
 
             $price = round($gold_price, 2);
 
-            if (isset($lab_grown_price->weight) && $lab_grown_price->weight > 0) {
+            if (isset($diamond_weight->weight) && $diamond_weight->weight > 0) {
 
                 $diamond_price = $diamond_weight->weight * $lab_grown_price;
             } else {
 
                 $diamond_price = 0;
             }
-
             $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
 
             $tax = $final_price * $tax_info->percentage / 100;

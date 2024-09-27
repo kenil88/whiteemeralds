@@ -287,6 +287,13 @@ class PublicAjaxController extends BaseController
             $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
             $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
 
+
+            if ($gold_weight <= 5) {
+                $making_charges *= 5;
+            } else {
+                $making_charges *= $gold_weight;
+            }
+
             $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
             $tax = $final_price * $tax_info->percentage / 100;
@@ -301,6 +308,11 @@ class PublicAjaxController extends BaseController
             $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
             $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
 
+            if ($gold_weight <= 5) {
+                $making_charges *= 5;
+            } else {
+                $making_charges *= $gold_weight;
+            }
             $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
             $tax = 0;
@@ -309,11 +321,6 @@ class PublicAjaxController extends BaseController
             $total_price_with_tax = round($total_price_with_tax, 2);
         }
 
-        if ($gold_weight <= 5) {
-            $making_charges *= 5;
-        } else {
-            $making_charges *= $gold_weight;
-        }
 
         // Output total price and individual prices for debugging
         $arr =
