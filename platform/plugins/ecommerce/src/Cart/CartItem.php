@@ -239,78 +239,82 @@ class CartItem implements Arrayable, Jsonable
         $stone_weight = '';
         $stone_type = '';
 
-        foreach ($options['options']['optionInfo'] as $key => $info) {
-            if ($info === "Loose Bracelet Size" && isset($options['options']['optionCartValue'][$key])) {
-                $looseBraceletSize = $options['options']['optionCartValue'][$key][0]['option_value'];
-            }
+        if (isset($options['options'])) {
+            foreach ($options['options']['optionInfo'] as $key => $info) {
+                if ($info === "Loose Bracelet Size" && isset($options['options']['optionCartValue'][$key])) {
+                    $looseBraceletSize = $options['options']['optionCartValue'][$key][0]['option_value'];
+                }
 
-            if (($info === "Diamond" || $info === "Lab Grown Diamond" || $info === "Natural Diamond")
-                && isset($options['options']['optionCartValue'][$key])
-            ) {
-                $diamond_option_value = $options['options']['optionCartValue'][$key][0]['option_value'];
-                $diamondWeight = $options['options']['optionCartValue'][$key][0]['weight'];
+                if (($info === "Diamond" || $info === "Lab Grown Diamond" || $info === "Natural Diamond")
+                    && isset($options['options']['optionCartValue'][$key])
+                ) {
+                    $diamond_option_value = $options['options']['optionCartValue'][$key][0]['option_value'];
+                    $diamondWeight = $options['options']['optionCartValue'][$key][0]['weight'];
 
-                if ($diamond_option_value == 'Natural Diamond') {
-                    $diamond_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
+                    if ($diamond_option_value == 'Natural Diamond') {
+                        $diamond_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
+                    }
+                }
+
+                if (($info === "Metal Purity") && isset($options['options']['optionCartValue'][$key])) {
+                    $metal_purity = $options['options']['optionCartValue'][$key][0]['option_value'];
+                    $goldWeight = $options['options']['optionCartValue'][$key][0]['weight'];
+                }
+
+                if ($info === "Gem Stone") {
+                    $gemstone_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
+                    $stone_type = $options['options']['optionCartValue'][$key][0]['option_value'];
+                    $stone_weight = $options['options']['optionCartValue'][$key][0]['weight'];
                 }
             }
 
-            if (($info === "Metal Purity") && isset($options['options']['optionCartValue'][$key])) {
-                $metal_purity = $options['options']['optionCartValue'][$key][0]['option_value'];
-                $goldWeight = $options['options']['optionCartValue'][$key][0]['weight'];
+            // Diamond Pricing Logic
+            if ($diamond_option_value == 'Lab Grown Diamond') {
+                if (get_application_currency_id() == 4) {
+                    $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown');
+                } else {
+                    $labgrown_diamond_price_per_carat = ($diamondWeight > '0.20')
+                        ? config('plugins.ecommerce.general.diamond_charges_USD.upto_20')
+                        : config('plugins.ecommerce.general.diamond_charges_USD.after_20');
+                }
+                $diamond_price = $diamondWeight * $labgrown_diamond_price_per_carat;
             }
 
-            if ($info === "Gem Stone") {
-                $gemstone_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
-                $stone_type = $options['options']['optionCartValue'][$key][0]['option_value'];
-                $stone_weight = $options['options']['optionCartValue'][$key][0]['weight'];
+            // Gold Pricing Logic
+            $gold_price = 0;
+            if ($metal_purity == '14K') {
+                $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.14K');
+            } elseif ($metal_purity == '18K') {
+                $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.18K');
+            } elseif ($metal_purity == '10K') {
+                $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.10K');
             }
-        }
 
-        // Diamond Pricing Logic
-        if ($diamond_option_value == 'Lab Grown Diamond') {
             if (get_application_currency_id() == 4) {
-                $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown');
+                $price = round($gold_price, 2);
+                $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
+                $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
+                $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
+                $tax = $final_price * 3 / 100;
+                $total_price_with_tax = round($final_price + $tax);
             } else {
-                $labgrown_diamond_price_per_carat = ($diamondWeight > '0.20')
-                    ? config('plugins.ecommerce.general.diamond_charges_USD.upto_20')
-                    : config('plugins.ecommerce.general.diamond_charges_USD.after_20');
+                $price = round($gold_price / get_current_exchange_rate(), 2);
+                $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
+                $total_price_with_tax = round($final_price, 2);
             }
-            $diamond_price = $diamondWeight * $labgrown_diamond_price_per_carat;
-        }
 
-        // Gold Pricing Logic
-        $gold_price = 0;
-        if ($metal_purity == '14K') {
-            $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.14K');
-        } elseif ($metal_purity == '18K') {
-            $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.18K');
-        } elseif ($metal_purity == '10K') {
-            $gold_price = $goldWeight * config('plugins.ecommerce.general.gold_price.10K');
-        }
+            if ($goldWeight <= 5) {
+                $making_charges *= 5;
+            } else {
+                $making_charges *= $goldWeight;
+            }
 
-        if (get_application_currency_id() == 4) {
-            $price = round($gold_price, 2);
-            $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
-            $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
-            $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
-            $tax = $final_price * 3 / 100;
-            $total_price_with_tax = round($final_price + $tax);
+            return $total_price_with_tax;
         } else {
-            $price = round($gold_price / get_current_exchange_rate(), 2);
-            $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
-            $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
-            $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
-            $total_price_with_tax = round($final_price, 2);
+            return 0;
         }
-
-        if ($goldWeight <= 5) {
-            $making_charges *= 5;
-        } else {
-            $making_charges *= $goldWeight;
-        }
-
-        return $total_price_with_tax;
     }
 
 
