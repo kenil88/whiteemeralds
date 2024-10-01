@@ -47,11 +47,16 @@ class ProductPrice
             $diamondWeight = null;
             $goldWeight = null;
             $diamond_price = 0;
+            $default_size = 13;
             $gemstone_price = 0;
             $stone_weight = '';
             $stone_type = '';
             $options = $options;
             $total_price_with_tax = 0;
+            if ($this->product->categories[0]->id == 25) {
+                $default_size = 20; // Reference size
+                $selected_size = $default_size; // Initialize selected size
+            }
             if ($options) {
                 foreach ($options['options']['optionInfo'] as $key => $info) {
                     if ($info === "Loose Bracelet Size" && isset($options['options']['optionCartValue'][$key])) {
@@ -73,11 +78,39 @@ class ProductPrice
                         $metal_purity = $options['options']['optionCartValue'][$key][0]['option_value'];
                         $goldWeight = $options['options']['optionCartValue'][$key][0]['weight'];
                     }
-
-                    if ($info === "Gem Stone") {
+                    if ($info === "Gem Stone" || $info === "Black Diamond") {
                         $gemstone_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
                         $stone_type = $options['options']['optionCartValue'][$key][0]['option_value'];
                         $stone_weight = $options['options']['optionCartValue'][$key][0]['weight'];
+                    }
+
+                    if ($info === "Size") {
+                        $selected_size = $options['options']['optionCartValue'][$key][0]['option_value'];
+                        if ($this->product->categories[0]->id == 23 || $this->product->categories[0]->id == 24 || $this->product->categories[0]->id == 34) {
+                            $size_difference = $selected_size - $default_size; // Calculate the size difference
+
+                            // Adjust gold weight by 0.150 for each size difference
+                            $weight_change = abs($size_difference) * 0.150;
+
+                            if ($size_difference > 0) {
+                                // Size increased, increase gold weight
+                                $goldWeight += $weight_change;
+                            } elseif ($size_difference < 0) {
+                                // Size decreased, decrease gold weight
+                                $goldWeight -= $weight_change;
+                            }
+                        } elseif ($this->product->categories[0]->id == 25) {
+                            $size_difference = $selected_size - $default_size; // Calculate the size difference
+                            // Adjust gold weight by 0.250 for each size difference
+                            $weight_change = abs($size_difference) * 0.250;
+                            if ($size_difference > 0) {
+                                // Size increased, increase gold weight
+                                $goldWeight += $weight_change;
+                            } elseif ($size_difference < 0) {
+                                // Size decreased, decrease gold weight
+                                $goldWeight -= $weight_change;
+                            }
+                        }
                     }
                 }
 
@@ -107,6 +140,13 @@ class ProductPrice
                     $price = round($gold_price, 2);
                     $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
                     $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
+
+                    if ($goldWeight <= 5) {
+                        $making_charges *= 5;
+                    } else {
+                        $making_charges *= $goldWeight;
+                    }
+
                     $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
                     $tax = $final_price * 3 / 100;
                     $total_price_with_tax = round($final_price + $tax);
@@ -114,17 +154,17 @@ class ProductPrice
                     $price = round($gold_price / get_current_exchange_rate(), 2);
                     $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
                     $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+
+                    if ($goldWeight <= 5) {
+                        $making_charges *= 5;
+                    } else {
+                        $making_charges *= $goldWeight;
+                    }
+
                     $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
                     $total_price_with_tax = round($final_price, 2);
                 }
-
-                if ($goldWeight <= 5) {
-                    $making_charges *= 5;
-                } else {
-                    $making_charges *= $goldWeight;
-                }
             }
-
 
             return $this->applyFilters('price', 'value', (float) $total_price_with_tax);
         }
@@ -175,16 +215,29 @@ class ProductPrice
         } else {
             $lab_grown_price = config('plugins.ecommerce.general.diamond_charges.labgrown');
 
-            $gold_weight = Option::select('ec_option_value.weight')->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')->where('ec_options.product_id', $this->product->id)->where('ec_option_value.option_value', '14K')->first();
+            $gold_weight = Option::select('ec_option_value.weight')
+                ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
+                ->where('ec_options.product_id', $this->product->id)
+                ->where('ec_option_value.option_value', '14K')
+                ->first();
 
-            $diamond_weight = Option::select('ec_option_value.weight')->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')->where('ec_options.product_id', $this->product->id)->where('ec_option_value.option_value', 'Lab Grown Diamond')->first();
+            $diamond_weight = Option::select('ec_option_value.weight')
+                ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
+                ->where('ec_options.product_id', $this->product->id)
+                ->where('ec_option_value.option_value', 'Lab Grown Diamond')
+                ->first();
+
+            $gemstone_price = Option::select('ec_option_value.affect_price')
+                ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
+                ->where('ec_options.product_id', $this->product->id)
+                ->where('ec_option_value.option_value', 'Black')
+                ->first();
 
             $tax_info = Tax::where('id', 4)->first();
             $gold_price = 0;
             if ($gold_weight) {
                 $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
             }
-
 
             $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
 
@@ -209,7 +262,12 @@ class ProductPrice
 
                 $diamond_price = 0;
             }
-            $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
+
+            if (isset($gemstone_price->affect_price) && $gemstone_price->affect_price != 'null') {
+                $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price->affect_price;
+            } else {
+                $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
+            }
 
             $tax = $final_price * $tax_info->percentage / 100;
 

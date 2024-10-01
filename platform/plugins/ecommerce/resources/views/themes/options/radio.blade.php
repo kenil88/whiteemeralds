@@ -1,22 +1,22 @@
 @php
-    // Get the output from the displayAsText() function
-    $priceText = $product->price()->displayAsText();
+    // // Get the output from the displayAsText() function
+    // $priceText = $product->price()->displayAsText();
 
-    // Use regex to capture either alphabetic currency codes (like USD) or symbols (like ₹)
-    preg_match('/^[^\d]+/', $priceText, $matches);
-    $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
+    // // Use regex to capture either alphabetic currency codes (like USD) or symbols (like ₹)
+    // preg_match('/^[^\d]+/', $priceText, $matches);
+    // $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
     // Define the allowed purity options for each currency
     $allowedPurities = [];
-    if ($currency == '₹ ') {
+    if (get_application_currency_id() == 4) {
         $allowedPurities = ['18k', '14k'];
-    } elseif ($currency == 'USD ') {
+    } elseif (get_application_currency_id() == 1) {
         $allowedPurities = ['14k', '10k'];
     }
 @endphp
 
 <div
     class="form-group mb-3 variant-radio product-option product-option-{{ Str::slug($option->name) }} product-option-{{ $option->id }}"
-    style="margin-bottom: 10px"
+    style="margin-bottom: 0px !important"
 >
     <div class="product-option-item-wrapper">
         <div class="product-option-item-label">

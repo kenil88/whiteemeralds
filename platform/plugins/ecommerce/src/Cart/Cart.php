@@ -299,8 +299,7 @@ class Cart
             if (! EcommerceHelper::isTaxEnabled()) {
                 return $total + $cartItem->qty * $cartItem->price;
             }
-
-            return $total + ($cartItem->qty * ($cartItem->priceTax == 0 ? $cartItem->price : $cartItem->priceTax));
+            return $total + ($cartItem->qty * $cartItem->price);
         }, 0);
     }
 

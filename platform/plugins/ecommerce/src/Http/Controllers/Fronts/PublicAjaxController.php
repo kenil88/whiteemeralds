@@ -131,8 +131,9 @@ class PublicAjaxController extends BaseController
         $stone_weight = 0;
         $diamond_final_type = '';
         $diamond_price = 0;
+
         if ($get_cat_id->category_id == 25) {
-            $default_size = 13; // Reference size
+            $default_size = 20; // Reference size
             $selected_size = $default_size; // Initialize selected size
         }
 
@@ -172,7 +173,7 @@ class PublicAjaxController extends BaseController
                             $diamond_weight = $weight;  // Set weight for lab-grown diamond
                             $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
                         }
-                    } elseif ($option['name'] == 'Gem Stone') {
+                    } elseif ($option['name'] == 'Gem Stone' || $option['name'] == 'Black Diamond') {
                         $gemstone_price = $option['affect_price'];
                         $stone_type = $option['option_value'];
                         $stone_weight = $option['weight'];
@@ -195,6 +196,7 @@ class PublicAjaxController extends BaseController
                 }
             }
         }
+
         // category id = 25 is for ladies
         // category id = 24 is for gentes
         if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
@@ -215,7 +217,6 @@ class PublicAjaxController extends BaseController
 
             // Adjust gold weight by 0.250 for each size difference
             $weight_change = abs($size_difference) * 0.250;
-
             if ($size_difference > 0) {
                 // Size increased, increase gold weight
                 $gold_weight += $weight_change;
@@ -224,6 +225,8 @@ class PublicAjaxController extends BaseController
                 $gold_weight -= $weight_change;
             }
         }
+
+
         // Calculate price based on selected options
 
         if ($diamond_type == 'natural') {

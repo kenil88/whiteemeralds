@@ -105,36 +105,34 @@
 	  });
 	});
       })
-    </script> --}}
-    
-     {{-- {{ RvMedia::image($product->image, $product->name) }} --}}
+    </script>
+     --}}
      {{-- <div id="popup">
         <div id="popupContent">
             <span id="closePopup">&times;</span>
             <div class="example-container">
                 <div class="options-panel">
-	
-	<img id="earring" src="{{ RvMedia::image($product->image, $product->name) }}"/>
-      </div>
-      <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-        <a-assets>
-          <a-asset-item id="earringModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/earring/scene.gltf"></a-asset-item>
-        </a-assets>
-        <a-camera active="false" position="0 0 0"></a-camera>
-	<!-- head occluder -->
-       
-        <a-entity mindar-face-target="anchorIndex: 127">
-	  <a-gltf-model rotation="-0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 356">
-	  <a-gltf-model rotation="0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
-        </a-entity>
-      </a-scene>
-            </div>
-        </div>
-    </div> --}}
+                {{-- <img id="earring" src="{{ RvMedia::image($product->image, $product->name) }}"/>
+                </div>
+                <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+                    <a-assets>
+                    <a-asset-item id="earringModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/earring/scene.gltf"></a-asset-item>
+                    </a-assets>
+                    <a-camera active="false" position="0 0 0"></a-camera>
+                <!-- head occluder -->
+                
+                    <a-entity mindar-face-target="anchorIndex: 127">
+                <a-gltf-model rotation="-0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
+                    </a-entity>
+                    <a-entity mindar-face-target="anchorIndex: 356">
+                <a-gltf-model rotation="0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
+                    </a-entity>
+                </a-scene>
+                        </div>
+                    </div>
+                </div> --}}
 
-            {{-- <a id="tryNowBtn">Try Now</a> --}}
+            {{-- <a id="tryNowBtn" class="tp-product-details-buy-now-btn w-30">Try Now</a> --}}
 <style>
         .example-container {
             width: 100%;
@@ -182,7 +180,7 @@
             cursor: pointer;
         }
     </style>
-    {{-- <script>
+    <script>
         // Show the popup
         document.getElementById('tryNowBtn').onclick = function() {
             document.getElementById('popup').style.display = 'block';
@@ -199,7 +197,7 @@
                 document.getElementById('popup').style.display = 'none';
             }
         };
-    </script> --}}
+    </script>
     
     @if (EcommerceHelper::isCartEnabled())
         @php
@@ -251,11 +249,6 @@
              
         </div>
     @endif
-
-    {{-- @php
-
-        dd($product->id);
-@endphp --}}
 
     <div class="tp-product-details-action-sm">
         @if (EcommerceHelper::isCompareEnabled())

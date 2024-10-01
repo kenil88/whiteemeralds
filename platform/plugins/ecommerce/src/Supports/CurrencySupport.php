@@ -80,6 +80,20 @@ class CurrencySupport
             $this->currencies();
         }
 
+        // $userIPAddress = $this->getUseIpAddress();
+
+        // if (session('currency')) {
+        //     $currency = $this->currencies->where('title', session('currency'))->first();
+        // } elseif ((int) get_ecommerce_setting('enable_auto_detect_visitor_currency', 0) == 1) {
+        //     $currency = $this->currencies->where('title', $this->detectedCurrencyCode())->first();
+        // }
+
+        // if (!empty($userIPAddress) && $userIPAddress['country_code'] == 'IN') {
+        //     $currency = $this->currencies->where('title', 'INR')->first();
+        // } else {
+        //     $currency = $this->currencies->where('title', 'USD')->first();
+        // }
+
         if (! $currency) {
             $currency = $this->getDefaultCurrency();
         }
@@ -87,6 +101,9 @@ class CurrencySupport
         if (! $currency->is_default) {
             $this->currency = $this->setCurrencyExchangeRate($currency);
         }
+
+        // session(['currency_data' => $currency->title]);
+
 
         return $currency;
     }

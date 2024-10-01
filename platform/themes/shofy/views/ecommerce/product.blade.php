@@ -71,7 +71,7 @@
                             </div>
                         </nav>
                         <div class="tab-content" id="navPresentationTabContent">
-                            <div class="tab-pane fade show active" id="nav-description" role="tabpanel" aria-labelledby="nav-description-tab" tabindex="0">
+                            {{-- <div class="tab-pane fade show active" id="nav-description" role="tabpanel" aria-labelledby="nav-description-tab" tabindex="0">
                                 <div class="tp-product-details-desc-wrapper">
                                     <div class="ck-content">
                                         {!! BaseHelper::clean($product->content) !!}
@@ -79,7 +79,7 @@
 
                                     {!! apply_filters(BASE_FILTER_PUBLIC_COMMENT_AREA, null, $product) !!}
                                 </div>
-                            </div>
+                            </div> --}}
                                 @if($product->categories[0]->parent_id != 35)
                             {{-- @if (EcommerceHelper::isProductSpecificationEnabled() && $product->specificationAttributes->where('pivot.hidden', false)->isNotEmpty()) --}}
                                 <div class="tab-pane fade show active" id="nav-specification" role="tabpanel" aria-labelledby="nav-specification-tab" tabindex="0">

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
@@ -101,7 +102,7 @@ class CartItem implements Arrayable, Jsonable
         $this->id = $item->getBuyableIdentifier($this->options);
         $this->name = $item->getBuyableDescription($this->options);
         $this->price = $item->getBuyablePrice($this->options);
-        $this->priceTax = $this->price + $this->tax;
+        $this->priceTax = $this->price;
     }
 
     public function updateFromArray(array $attributes): void
@@ -110,7 +111,7 @@ class CartItem implements Arrayable, Jsonable
         $this->qty = Arr::get($attributes, 'qty', $this->qty);
         $this->name = Arr::get($attributes, 'name', $this->name);
         $this->price = Arr::get($attributes, 'price', $this->price);
-        $this->priceTax = $this->price + $this->tax;
+        $this->priceTax = $this->price;
         $this->options = new CartItemOptions(Arr::get($attributes, 'options', $this->options));
 
         $this->rowId = $this->generateRowId($this->id, $this->options->all());
@@ -231,13 +232,23 @@ class CartItem implements Arrayable, Jsonable
     {
         $options = $this->options->toArray();
 
+        $get_cat_id = DB::select("select * from `ec_product_category_product` where `product_id` = '" . $this->id . "' limit 1");
+
+        $cat_id = $get_cat_id[0]->category_id;
+
         $looseBraceletSize = null;
         $diamondWeight = null;
         $goldWeight = null;
         $diamond_price = 0;
+        $default_size = 13;
         $gemstone_price = 0;
         $stone_weight = '';
         $stone_type = '';
+
+        if ($cat_id == 25) {
+            $default_size = 20; // Reference size
+            $selected_size = $default_size; // Initialize selected size
+        }
 
         if (isset($options['options'])) {
             foreach ($options['options']['optionInfo'] as $key => $info) {
@@ -261,10 +272,38 @@ class CartItem implements Arrayable, Jsonable
                     $goldWeight = $options['options']['optionCartValue'][$key][0]['weight'];
                 }
 
-                if ($info === "Gem Stone") {
+                if ($info === "Gem Stone" || $info === "Black Diamond") {
                     $gemstone_price = $options['options']['optionCartValue'][$key][0]['affect_price'];
                     $stone_type = $options['options']['optionCartValue'][$key][0]['option_value'];
                     $stone_weight = $options['options']['optionCartValue'][$key][0]['weight'];
+                }
+                if ($info === "Size") {
+                    $selected_size = $options['options']['optionCartValue'][$key][0]['option_value'];
+                    if ($cat_id == 23 || $cat_id == 24 || $cat_id == 34) {
+                        $size_difference = $selected_size - $default_size; // Calculate the size difference
+
+                        // Adjust gold weight by 0.150 for each size difference
+                        $weight_change = abs($size_difference) * 0.150;
+
+                        if ($size_difference > 0) {
+                            // Size increased, increase gold weight
+                            $goldWeight += $weight_change;
+                        } elseif ($size_difference < 0) {
+                            // Size decreased, decrease gold weight
+                            $goldWeight -= $weight_change;
+                        }
+                    } elseif ($cat_id == 25) {
+                        $size_difference = $selected_size - $default_size; // Calculate the size difference
+                        // Adjust gold weight by 0.250 for each size difference
+                        $weight_change = abs($size_difference) * 0.250;
+                        if ($size_difference > 0) {
+                            // Size increased, increase gold weight
+                            $goldWeight += $weight_change;
+                        } elseif ($size_difference < 0) {
+                            // Size decreased, decrease gold weight
+                            $goldWeight -= $weight_change;
+                        }
+                    }
                 }
             }
 
@@ -294,6 +333,12 @@ class CartItem implements Arrayable, Jsonable
                 $price = round($gold_price, 2);
                 $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
                 $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
+
+                if ($goldWeight <= 5) {
+                    $making_charges *= 5;
+                } else {
+                    $making_charges *= $goldWeight;
+                }
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
                 $tax = $final_price * 3 / 100;
                 $total_price_with_tax = round($final_price + $tax);
@@ -301,14 +346,15 @@ class CartItem implements Arrayable, Jsonable
                 $price = round($gold_price / get_current_exchange_rate(), 2);
                 $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
                 $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+
+                if ($goldWeight <= 5) {
+                    $making_charges *= 5;
+                } else {
+                    $making_charges *= $goldWeight;
+                }
+
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
                 $total_price_with_tax = round($final_price, 2);
-            }
-
-            if ($goldWeight <= 5) {
-                $making_charges *= 5;
-            } else {
-                $making_charges *= $goldWeight;
             }
 
             return $total_price_with_tax;
