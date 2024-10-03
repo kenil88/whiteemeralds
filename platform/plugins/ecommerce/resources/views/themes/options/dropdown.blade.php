@@ -30,15 +30,26 @@
                             $price = $value->affect_type == 0 ? $value->affect_price : (floatval($value->affect_price) * $product->price()->getPrice()) / 100;
                         }
                     @endphp
+                    @if($product->categories[0]->id != 27)
                     <option
                         data-extra-price="{{ $price }}"
                         value="{{ $value->option_value }}"
                         {{-- Set default selected value for 'ladies ring' as 13 and 'gents ring' as 20 --}}
                         {{ strtolower($product->categories[0]->name) == 'gents ring' ? ($value->option_value == 20 ? 'selected' : '') : ($value->option_value == 13 ? 'selected' : '') }}
                     >{{ $value->option_value }} {{ $price > 0 ? '+' . format_price($price) : '' }}</option>
+                    @else
+                    <option
+                        data-extra-price="{{ $price }}"
+                        value="{{ $value->option_value }}"
+                        {{-- Set default selected value for 'ladies ring' as 13 and 'gents ring' as 20 --}}
+                        {{ ($value->option_value == 2.4 || $value->option_value == 7.5) ? 'selected' : '' }}
+                    >{{ $value->option_value }} {{ $price > 0 ? '+' . format_price($price) : '' }}</option>
+                    @endif
                 @endforeach
             </select>
+            @if($product->categories[0]->id != 27 && $product->categories[0]->id != 36)
             <x-core::size-chart />
+            @endif
         </div>
     </div>
 </div>

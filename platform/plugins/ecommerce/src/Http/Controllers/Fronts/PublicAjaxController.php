@@ -70,15 +70,15 @@ class PublicAjaxController extends BaseController
             }, ARRAY_FILTER_USE_BOTH);
             $json['metal_purity'] = $ret['metal_purity'];
             $json['gold_weight'] = round($ret['gold_weight'], 3);
-            $json['gold_price'] = format_price($ret['gold_price']);
-            $json['diamond_price'] = format_price($ret['diamond_price']);
+            $json['gold_price'] = format_price_without_symbol($ret['gold_price']);
+            $json['diamond_price'] = format_price_without_symbol($ret['diamond_price']);
             // $json['black_diamond_price'] = $this->currency->format($ret['black_diamond_price'], $this->session->data['currency']);
-            $json['gemstone_price'] = format_price($ret['gemstone_price']);
-            $json['certificate_charges'] = format_price($ret['certificate_charges']);
-            $json['making_charges'] = format_price($ret['making_charges']);
-            $json['product_price'] = format_price($ret['original_price']);
+            $json['gemstone_price'] = format_price_without_symbol($ret['gemstone_price']);
+            $json['certificate_charges'] = format_price_without_symbol($ret['certificate_charges']);
+            $json['making_charges'] = format_price_without_symbol($ret['making_charges']);
+            $json['product_price'] = format_price_without_symbol($ret['original_price']);
             // $json['product_price_with_option'] = $this->currency->format($ret['price'], $this->session->data['currency']);
-            $json['tax'] = format_price($ret['tax']);
+            $json['tax'] = format_price_without_symbol($ret['tax']);
             $json['total_price_with_tax'] = format_price(round($ret['total']));
             $json['diamond_name'] = $ret['diamond_name'];
             $json['diamond_weight'] = $ret['diamond_weight'];
@@ -106,8 +106,10 @@ class PublicAjaxController extends BaseController
             ->selectRaw('category_id')
             ->where('product_id', $product_id)
             ->first();
-
-        $tax_info = Tax::where('id', $product_info->tax_id)->first();
+        $tax_info = null;
+        if ($product_info) {
+            $tax_info = Tax::where('id', $product_info->tax_id)->first();
+        }
 
         $qty = $request['qty'];
 

@@ -1,15 +1,16 @@
 @php
     // // Get the output from the displayAsText() function
-    // $priceText = $product->price()->displayAsText();
-
+    $priceText = $product->price()->displayAsText();
+    
     // // Use regex to capture either alphabetic currency codes (like USD) or symbols (like ₹)
-    // preg_match('/^[^\d]+/', $priceText, $matches);
-    // $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
+    preg_match('/^[^\d]+/', $priceText, $matches);
+    $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
+    
     // Define the allowed purity options for each currency
     $allowedPurities = [];
-    if (get_application_currency_id() == 4) {
+    if ($currency == '₹ ') {
         $allowedPurities = ['18k', '14k'];
-    } elseif (get_application_currency_id() == 1) {
+    } elseif ($currency == 'USD ') {
         $allowedPurities = ['14k', '10k'];
     }
 @endphp
@@ -42,7 +43,6 @@
                 @php
                     // Check if this is a "metal purity" option
                     $isMetalPurity = Str::slug($option->name) == 'metal-purity';
-
                     // Determine if the option should be displayed (for metal purity based on currency)
                     $shouldDisplay = !$isMetalPurity || ($isMetalPurity && in_array(strtolower($value->option_value), $allowedPurities));
 

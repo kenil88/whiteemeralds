@@ -103,6 +103,10 @@
             <td>Making Charge</td>
             <td id="LabourCost"></td>
         </tr>
+         <tr>
+            <td>Gemstone Charge</td>
+            <td id="GemstoneCharges"></td>
+        </tr>
         <tr>
             <td>GST</td>
             <td id="GST"></td>

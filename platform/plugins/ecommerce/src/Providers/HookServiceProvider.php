@@ -162,15 +162,15 @@ class HookServiceProvider extends ServiceProvider
                     }
                 );
 
-            $rules = $fields->mapWithKeys(fn ($value, $key) => [$key => ['nullable', 'string']])->all();
+            $rules = $fields->mapWithKeys(fn($value, $key) => [$key => ['nullable', 'string']])->all();
 
             foreach ($fields as $key => $value) {
                 $rules[$key][] = function ($attribute, $value, $fail) use ($locale, $fields, $key, $themeOptions) {
                     if (
-                        collect($fields)->reject(fn ($v, $k) => $k === $key)->contains($value)
+                        collect($fields)->reject(fn($v, $k) => $k === $key)->contains($value)
                         || $themeOptions
-                            ->reject(fn ($value, $k) => $k === ThemeOption::getOptionKey($key, $locale))
-                            ->contains($value)
+                        ->reject(fn($value, $k) => $k === ThemeOption::getOptionKey($key, $locale))
+                        ->contains($value)
                     ) {
                         $fail(trans('plugins/ecommerce::ecommerce.theme_options.page_slug_already_exists', [
                             'slug' => $value,
@@ -193,11 +193,11 @@ class HookServiceProvider extends ServiceProvider
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, function ($widgets) {
                 foreach ($widgets as $key => $widget) {
                     if (in_array($key, [
-                            'widget_total_themes',
-                            'widget_total_users',
-                            'widget_total_plugins',
-                            'widget_total_pages',
-                        ]) && $widget['type'] == 'stats') {
+                        'widget_total_themes',
+                        'widget_total_users',
+                        'widget_total_plugins',
+                        'widget_total_pages',
+                    ]) && $widget['type'] == 'stats') {
                         Arr::forget($widgets, $key);
                     }
                 }
@@ -305,7 +305,7 @@ class HookServiceProvider extends ServiceProvider
                     }
 
                     return $html . Form::hidden('customer_id', auth('customer')->id())
-                            ->toHtml() . Form::hidden('customer_type', Customer::class)->toHtml();
+                        ->toHtml() . Form::hidden('customer_type', Customer::class)->toHtml();
                 }, 123);
             }
 
@@ -511,8 +511,7 @@ class HookServiceProvider extends ServiceProvider
                         'priceValidUntil' => Carbon::now()->addDay()->toDateString(),
                         'itemCondition' => 'https://schema.org/NewCondition',
                         'url' => $object->url,
-                        'availability' => $object->isOutOfStock(
-                        ) ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+                        'availability' => $object->isOutOfStock() ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
                     ];
 
                     if ($privacyPolicyUrl = theme_option('merchant_return_policy_url')) {
@@ -751,8 +750,8 @@ class HookServiceProvider extends ServiceProvider
                             'price' => $this->convertOrderAmount($product->price),
                             'price_per_order' => $this->convertOrderAmount(
                                 ($product->price * $product->qty)
-                                + ($order->tax_amount / $order->products->count())
-                                - ($order->discount_amount / $order->products->count())
+                                    + ($order->tax_amount / $order->products->count())
+                                    - ($order->discount_amount / $order->products->count())
                             ),
                             'qty' => $product->qty,
                         ];

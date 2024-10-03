@@ -60,6 +60,6 @@
         {!! apply_filters('ecommerce_cart_after_item_content', null, $cartItem) !!}
     </div>
     <div class="col-auto text-end">
-        <p>{{ format_price(Session::get('price_without_symbol')) }}</p>
+        <p>{{ format_price($cartItem->price) }}</p>
     </div>
 </div>

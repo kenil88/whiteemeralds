@@ -51,7 +51,60 @@ if (! function_exists('format_price')) {
         if ($useSymbol && $currency->is_prefix_symbol) {
             $space = (int) get_ecommerce_setting('add_space_between_price_and_currency', 0) == 1 ? ' ' : null;
 
-            return $space . human_price_text($price, $currency);
+            return $currency->symbol . $space . human_price_text($price, $currency);
+        }
+
+        return human_price_text($price, $currency, ($useSymbol ? $currency->symbol : $currency->title));
+    }
+}
+
+if (! function_exists('format_price_without_symbol')) {
+    function format_price_without_symbol(
+        float|null|string $price,
+        Currency|null|string $currency = null,
+        bool $withoutCurrency = false,
+        bool $useSymbol = true
+    ): string {
+        if ($currency) {
+            if (! $currency instanceof Currency) {
+                $currency = Currency::query()->find($currency);
+            }
+
+            if (! $currency) {
+                return human_price_text($price, $currency);
+            }
+
+            if ($currency->getKey() != get_application_currency_id() && $currency->exchange_rate > 0) {
+                $currentCurrency = get_application_currency();
+
+                if ($currentCurrency->is_default) {
+                    $price = $price / $currency->exchange_rate;
+                } else {
+                    $price = $price / $currency->exchange_rate * $currentCurrency->exchange_rate;
+                }
+
+                $currency = $currentCurrency;
+            }
+        } else {
+            $currency = get_application_currency();
+
+            if (! $currency) {
+                return human_price_text($price, $currency);
+            }
+
+            if (! $currency->is_default && $currency->exchange_rate > 0) {
+                $price = $price * $currency->exchange_rate;
+            }
+        }
+
+        if ($withoutCurrency) {
+            return (string) $price;
+        }
+
+        if ($useSymbol && $currency->is_prefix_symbol) {
+            $space = (int) get_ecommerce_setting('add_space_between_price_and_currency', 0) == 1 ? ' ' : null;
+
+            return  $space . human_price_text($price, $currency);
         }
 
         return human_price_text($price, $currency, ($useSymbol ? $currency->symbol : $currency->title));
