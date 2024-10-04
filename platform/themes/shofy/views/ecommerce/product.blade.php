@@ -120,7 +120,7 @@
         </div>
     </div>
 
-    <div class="tp-product-details-sticky-actions">
+    {{-- <div class="tp-product-details-sticky-actions">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-none d-lg-flex align-items-center gap-3">
@@ -156,7 +156,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </section>
 
 @if (EcommerceHelper::isEnabledRelatedProducts())

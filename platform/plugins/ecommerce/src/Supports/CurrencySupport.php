@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Locale;
 use Throwable;
+use GeoIp2\Database\Reader;
 
 class CurrencySupport
 {
@@ -68,6 +69,55 @@ class CurrencySupport
         return 'Unable to fetch location from any API key';
     }
 
+    public function getUserTimezone()
+    {
+        // Get the user's IP address
+        $userIp = $this->getUserIpAddress();
+
+        // If the IP is localhost, return a default timezone or a message
+        if ($userIp === '127.0.0.1' || $userIp === '::1') { // Check for IPv6 localhost as well
+            return [
+                'ip' => $userIp,
+                'timezone' => 'IST', // Default timezone for localhost
+                'message' => 'Testing on localhost, using default timezone UTC.'
+            ];
+        }
+
+        // Construct the path to the GeoLite2-City.mmdb file located in the storage folder
+        $databasePath = storage_path('app/GeoLite2-City.mmdb');
+
+        try {
+            // Initialize the GeoIP2 Reader with the path to the database
+            $reader = new Reader($databasePath);
+
+            // Get the city information for the given IP address
+            $record = $reader->city($userIp);
+
+            // Return the user's timezone in the JSON response
+            return [
+                'ip' => $userIp,
+                'timezone' => $record->location->timeZone
+            ];
+        } catch (\Exception $e) {
+            // Handle errors (e.g., file not found or invalid IP)
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function getUserIpAddress()
+    {
+        // Check for HTTP_X_FORWARDED_FOR header first
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Handle multiple IPs in the X-Forwarded-For header
+            $ipAddresses = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($ipAddresses[0]); // Return the first IP
+        }
+
+        // Fallback to REMOTE_ADDR
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'; // Return '0.0.0.0' if REMOTE_ADDR is not set
+    }
+
+
     public function getApplicationCurrency(): ?Currency
     {
         $currency = $this->currency;
@@ -80,7 +130,8 @@ class CurrencySupport
             $this->currencies();
         }
 
-        // $userIPAddress = $this->getUseIpAddress();
+        $timezone = $this->getUserTimezone();
+
 
         // if (session('currency')) {
         //     $currency = $this->currencies->where('title', session('currency'))->first();
@@ -97,12 +148,12 @@ class CurrencySupport
         if (! $currency) {
             $currency = $this->getDefaultCurrency();
         }
-
+        // dd($timezon['timezone'], $currency);
         if (! $currency->is_default) {
             $this->currency = $this->setCurrencyExchangeRate($currency);
         }
 
-        // session(['currency_data' => $currency->title]);
+        session(['timezone' => $timezone['timezone']]);
 
 
         return $currency;
@@ -117,7 +168,12 @@ class CurrencySupport
         }
 
         if ($this->currencies instanceof Collection) {
-            $currency = $this->currencies->where('is_default', 1)->first();
+            // dd(session('timezone'));
+            if (session('timezone')  === 'IST') {
+                $currency = $this->currencies->where('id', 1)->first();
+            } else {
+                $currency = $this->currencies->where('id', 1)->first();
+            }
         }
 
         if (! $currency) {
@@ -139,7 +195,6 @@ class CurrencySupport
                 'exchange_rate' => 1,
             ]);
         }
-
         $this->defaultCurrency = $currency;
 
         return $this->defaultCurrency;

@@ -151,9 +151,9 @@ class ProductPrice
                     $tax = $final_price * 3 / 100;
                     $total_price_with_tax = round($final_price + $tax);
                 } else {
-                    $price = round($gold_price / get_current_exchange_rate(), 2);
-                    $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
-                    $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                    $price = round($gold_price, 2);
+                    $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india'), 2);
+                    $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india'), 2);
 
                     if ($goldWeight <= 5) {
                         $making_charges *= 5;
@@ -213,7 +213,6 @@ class ProductPrice
 
             return $this->applyFilters('price', 'value', (float) $price);
         } else {
-            $lab_grown_price = config('plugins.ecommerce.general.diamond_charges.labgrown');
 
             $gold_weight = Option::select('ec_option_value.weight')
                 ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
@@ -227,28 +226,48 @@ class ProductPrice
                 ->where('ec_option_value.option_value', 'Lab Grown Diamond')
                 ->first();
 
+            if (get_application_currency_id() == 4) {
+                $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown');
+            } else {
+                if (isset($diamond_weight->weight) && $diamond_weight->weight > 0) {
+
+                    $labgrown_diamond_price_per_carat =  ($diamond_weight->weight > '0.20')
+                        ? config('plugins.ecommerce.general.diamond_charges_USD.upto_20')
+                        : config('plugins.ecommerce.general.diamond_charges_USD.after_20');
+                } else {
+
+                    $labgrown_diamond_price_per_carat = 0;
+                }
+            }
+
             $gemstone_price = Option::select('ec_option_value.affect_price')
                 ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
                 ->where('ec_options.product_id', $this->product->id)
                 ->where('ec_option_value.option_value', 'Black')
                 ->first();
 
-            $tax_info = Tax::where('id', 4)->first();
+
             $gold_price = 0;
             if ($gold_weight) {
                 $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
             }
+            if ($gold_weight && get_application_currency_id() == 4) {
+                $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
 
-            $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
-
-            $making_charges = config('plugins.ecommerce.general.making_charge.India');
+                $making_charges = config('plugins.ecommerce.general.making_charge.India');
+                $tax_info = Tax::where('id', 4)->first();
+                $tax_info = $tax_info->percentage;
+            } else {
+                // $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.10K');
+                $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india'), 2);
+                $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india'), 2);
+                $tax_info = 0;
+            }
 
             if ($gold_weight) {
                 if ($gold_weight->weight <= 5) {
-
                     $making_charges *= 5;
                 } else {
-
                     $making_charges *= $gold_weight->weight;
                 }
             }
@@ -257,7 +276,7 @@ class ProductPrice
 
             if (isset($diamond_weight->weight) && $diamond_weight->weight > 0) {
 
-                $diamond_price = $diamond_weight->weight * $lab_grown_price;
+                $diamond_price = $diamond_weight->weight * $labgrown_diamond_price_per_carat;
             } else {
 
                 $diamond_price = 0;
@@ -268,8 +287,7 @@ class ProductPrice
             } else {
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
             }
-
-            $tax = $final_price * $tax_info->percentage / 100;
+            $tax = $final_price * $tax_info / 100;
 
             $total_price_with_tax = $tax + $final_price;
 

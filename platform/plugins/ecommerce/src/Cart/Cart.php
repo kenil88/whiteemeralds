@@ -602,8 +602,7 @@ class Cart
         }
 
         $weight = EcommerceHelper::validateOrderWeight($weight);
-
-        $this->products = $productsInCart->unique('id');
+        $this->products = $productsInCart;
         $this->weight = $weight;
 
         if ($this->products->isEmpty()) {

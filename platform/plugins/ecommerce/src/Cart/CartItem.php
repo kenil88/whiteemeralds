@@ -343,9 +343,9 @@ class CartItem implements Arrayable, Jsonable
                 $tax = $final_price * 3 / 100;
                 $total_price_with_tax = round($final_price + $tax);
             } else {
-                $price = round($gold_price / get_current_exchange_rate(), 2);
-                $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
-                $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
+                $price = round($gold_price, 2);
+                $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india'), 2);
+                $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india'), 2);
 
                 if ($goldWeight <= 5) {
                     $making_charges *= 5;

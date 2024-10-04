@@ -1,6 +1,6 @@
 <div class="tp-product-action-2 tp-product-action-blackStyle">
     <div class="tp-product-action-item-2 d-flex flex-column">
-        @if (EcommerceHelper::isCartEnabled())
+        {{-- @if (EcommerceHelper::isCartEnabled())
             <button
                 type="button"
                 class="tp-product-action-btn-2 tp-product-add-cart-btn"
@@ -62,9 +62,9 @@
                     @endif
                 </span>
             </button>
-        @endif
+        @endif --}}
 
-        <button
+        {{-- <button
             type="button"
             class="tp-product-action-btn-2 tp-product-quick-view-btn"
             title="{{ __('Quick View') }}"
@@ -87,7 +87,7 @@
                 />
             </svg>
             <span class="tp-product-tooltip tp-product-tooltip-right">{{ __('Quick View') }}</span>
-        </button>
+        </button> --}}
 
         @if (EcommerceHelper::isWishlistEnabled())
             <button

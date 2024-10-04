@@ -5,11 +5,10 @@
     // // Use regex to capture either alphabetic currency codes (like USD) or symbols (like ₹)
     preg_match('/^[^\d]+/', $priceText, $matches);
     $currency = $matches[0] ?? 'Unknown'; // Default to 'Unknown' if no match found
-    
     // Define the allowed purity options for each currency
     $allowedPurities = [];
     if ($currency == '₹ ') {
-        $allowedPurities = ['18k', '14k'];
+        $allowedPurities = ['14k', '18k'];
     } elseif ($currency == 'USD ') {
         $allowedPurities = ['14k', '10k'];
     }
