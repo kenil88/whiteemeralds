@@ -80,6 +80,9 @@ class PublicAjaxController extends BaseController
             // $json['product_price_with_option'] = $this->currency->format($ret['price'], $this->session->data['currency']);
             $json['tax'] = format_price_without_symbol($ret['tax']);
             $json['total_price_with_tax'] = format_price(round($ret['total']));
+            if (get_application_currency_id() === 1) {
+                $json['total_price_with_tax'] = 'USD ' . (round($ret['total'], 2));
+            }
             $json['diamond_name'] = $ret['diamond_name'];
             $json['diamond_weight'] = $ret['diamond_weight'];
             $json['diamond_type'] = $ret['diamond_type'];
@@ -236,6 +239,9 @@ class PublicAjaxController extends BaseController
             $diamond_name = 'Natural Diamond';
             $diamond_weight = $labgrown_weight;
             $diamond_final_type = 'EF Vvs';
+            if (get_application_currency_id() == 1) {
+                $diamond_final_type = 'EF Vvs / vs';
+            }
         }
         if ($diamond_type == 'labgrown') {
             $diamond_name = 'Lab Grown Diamond';
@@ -250,6 +256,9 @@ class PublicAjaxController extends BaseController
             }
             $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
             $diamond_final_type = 'EF Vvs / VS';
+            if (get_application_currency_id() == 1) {
+                $diamond_final_type = 'HI SI';
+            }
         }
 
         $gemstone_price = $gemstone_price;
@@ -307,6 +316,7 @@ class PublicAjaxController extends BaseController
 
             $total_price_with_tax = round($total_price_with_tax, 2);
         } else {
+
             $price = round($gold_price / get_current_exchange_rate(), 2);
             $gold_price = round($gold_price / get_current_exchange_rate(), 2);
             $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
@@ -321,7 +331,6 @@ class PublicAjaxController extends BaseController
             $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
             $tax = 0;
-
             $total_price_with_tax = $tax + $final_price;
             $total_price_with_tax = round($total_price_with_tax, 2);
         }

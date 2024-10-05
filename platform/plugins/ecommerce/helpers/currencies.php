@@ -40,7 +40,7 @@ if (! function_exists('format_price')) {
             }
 
             if (! $currency->is_default && $currency->exchange_rate > 0) {
-                $price = $price * $currency->exchange_rate;
+                $price = $price / $currency->exchange_rate;
             }
         }
 
@@ -165,6 +165,10 @@ if (! function_exists('get_current_exchange_rate')) {
         } elseif (! $currency instanceof Currency) {
             $currency = Currency::query()->find($currency);
         }
+        if ($currency->id == 1 && $currency->exchange_rate > 0) {
+            return $currency->exchange_rate;
+        }
+
         if ($currency->is_default && $currency->exchange_rate > 0) {
             return $currency->exchange_rate;
         }
@@ -195,7 +199,6 @@ if (! function_exists('get_application_currency')) {
         if (is_in_admin(true) || ! $currency) {
             $currency = cms_currency()->getDefaultCurrency();
         }
-
         return $currency;
     }
 }

@@ -28,6 +28,7 @@
         "botble/theme": "*@dev",
         "botble/widget": "*@dev",
         "doctrine/dbal": "^3.8",
+        "geoip2/geoip2": "^3.0",
         "guzzlehttp/guzzle": "^7.7",
         "laravel/framework": "^10.24",
         "laravel/sanctum": "^3.3",
