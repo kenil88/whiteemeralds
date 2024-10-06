@@ -59,6 +59,11 @@ class PublicAjaxController extends BaseController
     {
         $json = [];
         $ret = $this->getPrice($request);
+        if (! empty($ret) && $ret['category_id'] == 36) {
+            $json['total_price_with_tax'] = format_price(round($ret['total']));
+            return response()->json($json);
+        }
+
 
         if (! empty($ret)) {
             $total_price_with_tax = format_price($ret['gold_price'] * $ret['gold_weight']);
@@ -109,6 +114,16 @@ class PublicAjaxController extends BaseController
             ->selectRaw('category_id')
             ->where('product_id', $product_id)
             ->first();
+
+        if ($get_cat_id->category_id == 36) {
+            $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.ring');
+            $arr =
+                [
+                    'total' => $total_price_with_tax * $request['qty'],
+                    'category_id' => $get_cat_id->category_id,
+                ];
+            return $arr;
+        }
         $tax_info = null;
         if ($product_info) {
             $tax_info = Tax::where('id', $product_info->tax_id)->first();
@@ -136,6 +151,7 @@ class PublicAjaxController extends BaseController
         $stone_weight = 0;
         $diamond_final_type = '';
         $diamond_price = 0;
+        $metal_purity = '';
 
         if ($get_cat_id->category_id == 25) {
             $default_size = 20; // Reference size

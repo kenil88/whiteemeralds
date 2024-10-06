@@ -170,7 +170,7 @@ class CurrencySupport
         if ($this->currencies instanceof Collection) {
             // dd(session('timezone'));
             if (session('timezone')  === 'IST') {
-                $currency = $this->currencies->where('id', 1)->first();
+                $currency = $this->currencies->where('id', 4)->first();
             } else {
                 $currency = $this->currencies->where('id', 1)->first();
             }

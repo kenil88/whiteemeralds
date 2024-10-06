@@ -12,3 +12,4 @@
         data-bb-value="product-price"
     id="new-price">{{ $product->price()->displayAsText() }}</span>
 </div>
+<input name="product_id" type="hidden" value="{{ $product->id}}">
