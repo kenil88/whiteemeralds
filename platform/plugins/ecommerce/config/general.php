@@ -53,5 +53,11 @@ return [
         'upto_20'   =>  150000,
         'after_20'   =>  120000,
     ],
-    'dollar_price'    => 83
+    'dollar_price'    => 83,
+    '925_price' => [
+        'ring' => 100000,
+        'set' => 325000,
+        'earring' => 150000,
+        'kada' => 350000,
+    ]
 ];

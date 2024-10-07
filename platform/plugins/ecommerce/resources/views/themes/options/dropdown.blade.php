@@ -13,6 +13,7 @@
                 value="dropdown"
             />
             <input type="hidden" name="ring_category" value="{{ $product->categories[0]->name }}">
+            <input name="product_id" type="hidden" value="{{ $product->id}}">
             <select
                 class="form-select"
                 name="options[{{ $option->id }}][values]"
