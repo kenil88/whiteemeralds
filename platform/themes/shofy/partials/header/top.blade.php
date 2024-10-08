@@ -16,9 +16,15 @@
 >
     <div @class([$headerTopClass ?? null])>
         <div class="d-flex flex-wrap align-items-center justify-content-between">
-            <div class="position-relative">
+            @php
+                if(get_application_currency_id() == 4){
+            @endphp
+            <div class="position-relative" style="margin-left: 40%;">
                 {!! $announcements !!}
             </div>
+            @php
+                }
+            @endphp
             <div>
                 <div @class(['tp-header-top-right d-flex align-items-center justify-content-end', 'tp-header-top-black' => $colorMode === 'light'])>
                     <div class="tp-header-top-menu d-none d-lg-flex align-items-center justify-content-end">

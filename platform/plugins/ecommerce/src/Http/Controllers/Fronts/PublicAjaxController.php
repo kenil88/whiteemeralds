@@ -59,7 +59,7 @@ class PublicAjaxController extends BaseController
     {
         $json = [];
         $ret = $this->getPrice($request);
-        if (! empty($ret) && $ret['category_id'] == 36) {
+        if (! empty($ret) && isset($ret['category_id']) && $ret['category_id'] == 36) {
             $json['total_price_with_tax'] = format_price(round($ret['total']));
             return response()->json($json);
         }

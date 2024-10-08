@@ -182,21 +182,21 @@
     </style>
     <script>
         // Show the popup
-        document.getElementById('tryNowBtn').onclick = function() {
-            document.getElementById('popup').style.display = 'block';
-        };
+        // document.getElementById('tryNowBtn').onclick = function() {
+        //     document.getElementById('popup').style.display = 'block';
+        // };
 
-        // Hide the popup
-        document.getElementById('closePopup').onclick = function() {
-            document.getElementById('popup').style.display = 'none';
-        };
+        // // Hide the popup
+        // document.getElementById('closePopup').onclick = function() {
+        //     document.getElementById('popup').style.display = 'none';
+        // };
 
-        // Close the popup when clicking outside of the content
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('popup')) {
-                document.getElementById('popup').style.display = 'none';
-            }
-        };
+        // // Close the popup when clicking outside of the content
+        // window.onclick = function(event) {
+        //     if (event.target == document.getElementById('popup')) {
+        //         document.getElementById('popup').style.display = 'none';
+        //     }
+        // };
     </script>
     
     @if (EcommerceHelper::isCartEnabled())

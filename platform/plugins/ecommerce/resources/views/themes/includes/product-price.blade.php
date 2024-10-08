@@ -10,6 +10,6 @@
     <span
         class="{{ $priceClassName === null ? 'bb-product-price-text fw-bold' : $priceClassName }}"
         data-bb-value="product-price"
-    id="new-price">{{ $product->price()->displayAsText() }}</span>
+    id="new-price"></span>
 </div>
 <input name="product_id" type="hidden" value="{{ $product->id}}">

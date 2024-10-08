@@ -204,20 +204,21 @@ class ProductPrice
     {
         if ($this->product->categories[0]->parent_id == 35) {
             if ($includingTaxes) {
-                if ($this->product->categories[0]->id == 37) {
-                    $price = config('plugins.ecommerce.general.925_price.ring');
-                } elseif ($this->product->categories[0]->id == 38) {
-                    $price = config('plugins.ecommerce.general.925_price.set');
-                } elseif ($this->product->categories[0]->id == 39) {
-                    $price = config('plugins.ecommerce.general.925_price.earring');
-                } elseif ($this->product->categories[0]->id == 36) {
-                    $price = config('plugins.ecommerce.general.925_price.kada');
+                if (get_application_currency_id() == 1) {
+                    if ($this->product->categories[0]->id == 37) {
+                        $price = config('plugins.ecommerce.general.925_price.ring');
+                    } elseif ($this->product->categories[0]->id == 38) {
+                        $price = config('plugins.ecommerce.general.925_price.set');
+                    } elseif ($this->product->categories[0]->id == 39) {
+                        $price = config('plugins.ecommerce.general.925_price.earring');
+                    } elseif ($this->product->categories[0]->id == 36) {
+                        $price = config('plugins.ecommerce.general.925_price.kada');
+                    }
+                } else {
+                    $price = $this->product->front_sale_price_with_taxes != $this->product->price_with_taxes
+                        ? $this->product->front_sale_price_with_taxes
+                        : $this->product->price_with_taxes;
                 }
-                //  else {
-                //     $price = $this->product->front_sale_price_with_taxes != $this->product->price_with_taxes
-                //         ? $this->product->front_sale_price_with_taxes
-                //         : $this->product->price_with_taxes;
-                // }
             } else {
                 $price = $this->product->isOnSale() ? $this->product->front_sale_price : $this->product->price;
             }
