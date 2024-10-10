@@ -213,6 +213,7 @@
                                 <path d="M1 1H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </span>
+                        <input type="hidden" name="product_id" id="input-product-id" value="{{ $product->id}}">
                         <input class="tp-cart-input" id="input-quantity" type="number" name="qty" min="1" value="{{ $product->minimum_order_quantity ?: 1 }}" max="{{ $product->maximum_order_quantity ?: ($product->with_storehouse_management ? $product->quantity : 1000) }}" @readonly($isOutOfStock) />
                         <span class="tp-cart-plus" data-bb-toggle="increase-qty">
                             <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">

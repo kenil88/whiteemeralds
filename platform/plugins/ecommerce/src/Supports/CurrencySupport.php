@@ -84,19 +84,30 @@ class CurrencySupport
         }
 
         // Construct the path to the GeoLite2-City.mmdb file located in the storage folder
-        $databasePath = storage_path('app/GeoLite2-City.mmdb');
+        // $databasePath = storage_path('app/GeoLite2-City.mmdb');
 
         try {
-            // Initialize the GeoIP2 Reader with the path to the database
-            $reader = new Reader($databasePath);
+            // // Initialize the GeoIP2 Reader with the path to the database
+            // $reader = new Reader($databasePath);
 
-            // Get the city information for the given IP address
-            $record = $reader->city($userIp);
+            // // Get the city information for the given IP address
+            // $record = $reader->city($userIp);
+            // dd($record);
+            // // Return the user's timezone in the JSON response
+            // return [
+            //     'ip' => $userIp,
+            //     'timezone' => $record->location->timeZone
+            // ];
 
-            // Return the user's timezone in the JSON response
+            $ch = curl_init('http://ipwho.is/' . $userIp);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            $ipwhois = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+
             return [
                 'ip' => $userIp,
-                'timezone' => $record->location->timeZone
+                'timezone' => $ipwhois['timezone']['id']
             ];
         } catch (\Exception $e) {
             // Handle errors (e.g., file not found or invalid IP)
@@ -107,9 +118,9 @@ class CurrencySupport
     private function getUserIpAddress()
     {
         // Check for HTTP_X_FORWARDED_FOR header first
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        if (isset($_SERVER['REMOTE_ADDR'])) {
             // Handle multiple IPs in the X-Forwarded-For header
-            $ipAddresses = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $ipAddresses = explode(',', $_SERVER['REMOTE_ADDR']);
             return trim($ipAddresses[0]); // Return the first IP
         }
 
@@ -146,8 +157,8 @@ class CurrencySupport
         // }
 
         if (! $currency) {
-            if ($timezone['timezone'] === 'Asia/Kolkata') {
-                $currency = $this->currencies->where('id', 4)->first();
+            if ($timezone['timezone'] === 'IST') {
+                $currency = $this->currencies->where('id', 1)->first();
             } else {
                 $currency = $this->currencies->where('id', 1)->first();
             }

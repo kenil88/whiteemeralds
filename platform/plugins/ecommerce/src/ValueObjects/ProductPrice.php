@@ -202,6 +202,7 @@ class ProductPrice
 
     public function getPriceforproductlisting($options = null, bool $includingTaxes = true): float
     {
+
         if ($this->product->categories[0]->parent_id == 35) {
             if ($includingTaxes) {
                 if (get_application_currency_id() == 1) {
