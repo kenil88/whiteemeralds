@@ -284,14 +284,20 @@ class PublicAjaxController extends BaseController
                 $default_size = (int) $selected_size; // Output: 2
 
                 if ($default_size == 2) {
-                    $default_size = 2.4;
+                    $default_size = 2.04;
                 } else {
                     $default_size = 7.5;
                 }
+                $size_difference = (float) $selected_size - $default_size; // Size difference
+                if ($default_size == 2) {
+                    $increments = abs($size_difference) / 0.01; // How many 0.01 increments
+                } else {
+                    $increments = abs($size_difference) / 0.5; // How many 0.01 increments
+                }
 
-                $size_difference = (float) $selected_size - $default_size; // Calculate the size difference
+                // $size_difference = (float) $selected_size - $default_size; // Calculate the size difference
                 // Adjust gold weight by 0.250 for each size difference
-                $weight_change = abs($size_difference) * 5 / 100;
+                $weight_change = ($gold_weight * ($increments * 5)) / 100; // Total percentage change based on increments
 
                 if ($size_difference > 0) {
                     // Size increased, increase gold weight
@@ -301,6 +307,7 @@ class PublicAjaxController extends BaseController
                     $gold_weight -= $weight_change;
                 }
             }
+            // dd($weight_change, $gold_weight);
             // Calculate price based on selected options
 
             if ($diamond_type == 'natural') {

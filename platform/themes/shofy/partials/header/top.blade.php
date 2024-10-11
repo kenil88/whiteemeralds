@@ -16,15 +16,17 @@
 >
     <div @class([$headerTopClass ?? null])>
         <div class="d-flex flex-wrap align-items-center justify-content-between">
-            @php
+            
+            <div class="position-relative added_left" style="">
+                @php
                 if(get_application_currency_id() == 4){
             @endphp
-            <div class="position-relative" style="margin-left: 40%;">
                 {!! $announcements !!}
-            </div>
-            @php
+                  @php
                 }
             @endphp
+            </div>
+          
             <div>
                 <div @class(['tp-header-top-right d-flex align-items-center justify-content-end', 'tp-header-top-black' => $colorMode === 'light'])>
                     <div class="tp-header-top-menu d-none d-lg-flex align-items-center justify-content-end">
@@ -62,11 +64,20 @@
                                 </div>
                             @else
                                 <div class="tp-header-top-menu-item tp-header-setting">
-                                    <a href="{{ route('customer.login') }}">{{ __('Login') }}</a>
+                                    <a href="{{ route('customer.login') }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a5.53 5.53 0 0 0-4.467 2.248.5.5 0 0 0 .416.752h8.102a.5.5 0 0 0 .416-.752A5.53 5.53 0 0 0 8 9z"/>
+                                        </svg>
+                                    {{ __('Login') }}</a>
                                 </div>
-                                <div class="tp-header-top-menu-item tp-header-setting">
-                                    <a href="{{ route('customer.register') }}">{{ __('Register') }}</a>
-                                </div>
+                                {{-- <div class="tp-header-top-menu-item tp-header-setting">
+                                    <a href="{{ route('customer.register') }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a5.53 5.53 0 0 0-4.467 2.248.5.5 0 0 0 .416.752h8.102a.5.5 0 0 0 .416-.752A5.53 5.53 0 0 0 8 9z"/>
+                                        </svg>
+                                        {{ __('Register') }}
+                                    </a>
+                                </div> --}}
                             @endauth
                         @endif
                     </div>

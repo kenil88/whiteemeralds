@@ -94,24 +94,24 @@ class RegisterForm extends AuthForm
                     ->icon('ti ti-lock')
                     ->toArray()
             )
-            ->add(
-                'birthdate',
-                DatePickerField::class,
-                TextFieldOption::make()
-                    ->label(__('Birthdate'))
-                    ->placeholder(__('Birthdate'))
-                    ->icon('ti ti-calendar')
-                    ->toArray()
-            )
-            ->add(
-                'marriage_anniversary',
-                DatePickerField::class,
-                TextFieldOption::make()
-                    ->label(__('Marriage Anniversary'))
-                    ->placeholder(__('Marriage Anniversary'))
-                    ->icon('ti ti-calendar')
-                    ->toArray()
-            )
+            // ->add(
+            //     'dob',
+            //     DatePickerField::class,
+            //     TextFieldOption::make()
+            //         ->label(__('Birthdate'))
+            //         ->placeholder(__('Birthdate'))
+            //         ->icon('ti ti-calendar')
+            //         ->toArray()
+            // )
+            // ->add(
+            //     'marriage_anniversary',
+            //     DatePickerField::class,
+            //     TextFieldOption::make()
+            //         ->label(__('Marriage Anniversary'))
+            //         ->placeholder(__('Marriage Anniversary'))
+            //         ->icon('ti ti-calendar')
+            //         ->toArray()
+            // )
             ->add(
                 'agree_terms_and_policy',
                 OnOffCheckboxField::class,

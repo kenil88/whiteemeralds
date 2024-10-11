@@ -1,4 +1,4 @@
-@if (!empty($url))
+{{-- @if (!empty($url))
     <div
         @if(! $width && ! $height)
             style="position: relative; display: block; height: 0; padding-bottom: 56.25%; overflow: hidden;"
@@ -14,13 +14,62 @@
             allowfullscreen
             frameborder="0"
             @if ($height)
-                height="{{ $height }}"
+                height="360"
             @endif
 
             @if ($width)
-                width="{{ $width }}"
+                width="640"
             @endif
             title="Video"
         ></iframe>
     </div>
-@endif
+@endif --}}
+
+<div class="container">
+    <div class="row">
+        {{-- Video 1 --}}
+        <div class="col-md-6 col-lg-4 mb-4"> <!-- Adjust column size for different screen sizes -->
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe
+                    src="{{ $url }}" 
+                    class="embed-responsive-item"
+                    allowfullscreen
+                    frameborder="0"
+                    width="400"
+                    height="360"
+                    title="Video 1"
+                ></iframe>
+            </div>
+        </div>
+        
+        {{-- Video 2 --}}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe
+                    src="https://www.youtube.com/embed/U-iKl8WQKas" 
+                    class="embed-responsive-item"
+                    allowfullscreen
+                    frameborder="0"
+                    width="400"
+                    height="360"
+                    title="Video 2"
+                ></iframe>
+            </div>
+        </div>
+        
+        {{-- Video 3 --}}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe
+                    src="https://www.youtube.com/embed/zuNVVDGakqk" 
+                    class="embed-responsive-item"
+                    allowfullscreen
+                    frameborder="0"
+                    width="400"
+                    height="360"
+                    title="Video 3"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+</div>

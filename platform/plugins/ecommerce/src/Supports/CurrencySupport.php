@@ -158,7 +158,7 @@ class CurrencySupport
 
         if (! $currency) {
             if ($timezone['timezone'] === 'IST') {
-                $currency = $this->currencies->where('id', 1)->first();
+                $currency = $this->currencies->where('id', 4)->first();
             } else {
                 $currency = $this->currencies->where('id', 1)->first();
             }

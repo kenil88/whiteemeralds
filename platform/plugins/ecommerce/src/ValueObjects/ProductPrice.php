@@ -256,7 +256,7 @@ class ProductPrice
             $gemstone_price = Option::select('ec_option_value.affect_price')
                 ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
                 ->where('ec_options.product_id', $this->product->id)
-                ->where('ec_option_value.option_value', 'Black')
+                ->whereIn('ec_option_value.option_value', ['Black', 'Sapphire', 'Yellow Sapphire', 'Ruby', 'Pearl', 'Emerald'])
                 ->first();
 
 
@@ -294,7 +294,6 @@ class ProductPrice
 
                 $diamond_price = 0;
             }
-
             if (isset($gemstone_price->affect_price) && $gemstone_price->affect_price != 'null') {
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price->affect_price;
             } else {

@@ -25,8 +25,7 @@
                                 preload="auto"
                                 class="media-video"
                                 aria-label="{{ $product->name }}"
-                                poster="{{ $video['thumbnail'] }}"
-                            >
+                                poster="{{ $video['thumbnail'] }}" muted>
                                 <source src="{{ $video['url'] }}" type="video/{{ File::extension($video['url']) ?: 'mp4' }}">
                                 <img src="{{ $video['thumbnail'] }}" alt="{{ $video['url'] }}">
                             </video>
