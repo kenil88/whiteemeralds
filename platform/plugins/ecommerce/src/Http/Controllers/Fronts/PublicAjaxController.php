@@ -398,19 +398,19 @@ class PublicAjaxController extends BaseController
                 $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
                 $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
                 $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
-
                 if ($gold_weight <= 5) {
                     $making_charges *= 5;
                 } else {
                     $making_charges *= $gold_weight;
                 }
+
+                $gemstone_price = (float) round($gemstone_price / get_current_exchange_rate(), 2);
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price;
 
                 $tax = 0;
                 $total_price_with_tax = $tax + $final_price;
                 $total_price_with_tax = round($total_price_with_tax, 2);
             }
-
 
             // Output total price and individual prices for debugging
             $arr =

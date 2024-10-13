@@ -228,9 +228,15 @@ class ProductPrice
         } else {
 
             $gold_weight = Option::select('ec_option_value.weight')
-                ->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
+                ->join('ec_option_value', 'ec_option_value.option_id', '=', 'ec_options.id')
                 ->where('ec_options.product_id', $this->product->id)
-                ->where('ec_option_value.option_value', '14K')
+                ->where(function ($query) {
+                    if (get_application_currency_id() == 4) {
+                        $query->where('ec_option_value.option_value', '14K');
+                    } else {
+                        $query->where('ec_option_value.option_value', '10K');
+                    }
+                })
                 ->first();
 
             $diamond_weight = Option::select('ec_option_value.weight')
@@ -261,17 +267,14 @@ class ProductPrice
 
 
             $gold_price = 0;
-            if ($gold_weight) {
-                $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
-            }
             if ($gold_weight && get_application_currency_id() == 4) {
                 $certificate_charges = config('plugins.ecommerce.general.certificate_charge.India');
-
+                $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.14K');
                 $making_charges = config('plugins.ecommerce.general.making_charge.India');
                 $tax_info = Tax::where('id', 4)->first();
                 $tax_info = $tax_info->percentage;
             } else {
-                // $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.10K');
+                $gold_price = $gold_weight->weight * config('plugins.ecommerce.general.gold_price.10K');
                 $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india'), 2);
                 $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india'), 2);
                 $tax_info = 0;
@@ -286,23 +289,30 @@ class ProductPrice
             }
 
             $price = round($gold_price, 2);
-
             if (isset($diamond_weight->weight) && $diamond_weight->weight > 0) {
-
                 $diamond_price = $diamond_weight->weight * $labgrown_diamond_price_per_carat;
             } else {
-
                 $diamond_price = 0;
             }
+
             if (isset($gemstone_price->affect_price) && $gemstone_price->affect_price != 'null') {
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price + $gemstone_price->affect_price;
+                // print_r($price);
+                // print_r('     ');
+                // print_r($making_charges);
+                // print_r('     ');
+                // print_r($certificate_charges);
+                // print_r('     ');
+                // print_r($diamond_price);
+                // print_r('     ');
+                // print_r($gold_weight->weight);
             } else {
                 $final_price = $price + $making_charges + $certificate_charges + $diamond_price;
             }
+
             $tax = $final_price * $tax_info / 100;
 
             $total_price_with_tax = $tax + $final_price;
-
             // if ($includingTaxes) {
             //     $price = $this->product->front_sale_price_with_taxes != $this->product->price_with_taxes
             //         ? ($total_price_with_tax ?? 0)  // If affect_price is null, set it to 0
