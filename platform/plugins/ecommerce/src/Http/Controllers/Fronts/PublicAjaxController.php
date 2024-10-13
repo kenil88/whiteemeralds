@@ -281,15 +281,15 @@ class PublicAjaxController extends BaseController
                     $gold_weight -= $weight_change;
                 }
             } elseif ($get_cat_id->category_id == 27) {
-                $default_size = (int) $selected_size; // Output: 2
+                $selected_default_size = (int) $selected_size; // Output: 2
 
-                if ($default_size == 2) {
+                if ($selected_default_size == 2) {
                     $default_size = 2.04;
                 } else {
                     $default_size = 7.5;
                 }
                 $size_difference = (float) $selected_size - $default_size; // Size difference
-                if ($default_size == 2) {
+                if ($default_size == 2.04) {
                     $increments = abs($size_difference) / 0.01; // How many 0.01 increments
                 } else {
                     $increments = abs($size_difference) / 0.5; // How many 0.01 increments
