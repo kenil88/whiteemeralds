@@ -34,6 +34,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.9",
         "predis/predis": "^2.2",
+        "spatie/laravel-image-optimizer": "^1.8",
         "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {

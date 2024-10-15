@@ -120,8 +120,12 @@ class CurrencySupport
 
         $timezone = $this->getUserTimezone();
 
+        $isLocalhost = ($_SERVER['SERVER_NAME'] === '127.0.0.1' || $_SERVER['SERVER_NAME'] === 'localhost');
+
+        $timezone_local = $isLocalhost ? 'IST' : 'Asia/Kolkata';
+
         if (! $currency) {
-            if ($timezone['timezone'] === 'Asia/Kolkata') {
+            if ($timezone['timezone'] === $timezone_local) {
                 $currency = $this->currencies->where('id', 4)->first();
             } else {
                 $currency = $this->currencies->where('id', 1)->first();

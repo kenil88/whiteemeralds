@@ -1,7 +1,7 @@
 <div @class(['tp-product-item-2 mb-40', $class ?? null])>
     <div class="tp-product-thumb-2 p-relative z-index-1 fix w-img">
         <a href="{{ $product->url }}">
-            {{ RvMedia::image($product->image, $product->name, $style === 2 ? 'thumb' : 'medium', true) }}
+            {{ RvMedia::image(optimize_image($product->image), $product->name, $style === 2 ? 'thumb' : 'medium', true) }}
         </a>
 
         @include(Theme::getThemeNamespace('views.ecommerce.includes.product.badges'))
