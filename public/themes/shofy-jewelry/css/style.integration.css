@@ -1,0 +1,65 @@
+.tp-product-badge {
+	display: none;
+}
+.main-menu.menu-style-2 {
+	margin-inline-start: 0 !important;
+}
+
+.tp-product-category-thumb img {
+	height: 150px;
+	width: 150px;
+	margin-top: 20px;
+	margin-left: 10px;
+}
+.tp-product-details-additional-info table tr td{padding:5px 34px;}
+.tp-product-details-additional-info table tr td:first-child {
+        font-size: 14px;
+}
+.tp-product-details-additional-info table tr td:last-child {
+    font-size: 14px;
+}
+.tp-brand-item img {
+    height: 100%;
+    width: 100%;
+}
+video{    height: 400px;
+    margin: auto;
+    display: block;
+}
+@keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+.ae-anno-announcement__text {
+    color: var(--text-color);
+    font-size: 20px !important;
+    margin: 0;
+    font-weight: bold;
+    color: green !important;
+    animation: blink 1s infinite;
+}
+.added_left{margin-left: 40%;}
+/* Media Query for Mobile Devices (screens smaller than 768px) */
+@media screen and (max-width: 768px) {
+    .ae-anno-announcement__text {
+        font-size: 16px !important; /* Smaller font size for mobile */
+    }
+  .added_left{margin-left: 0%;}
+}
+
+/* Media Query for Smaller Mobile Devices (screens smaller than 480px) */
+@media screen and (max-width: 480px) {
+    .ae-anno-announcement__text {
+        font-size: 14px !important; /* Even smaller font size for very small screens */
+    }
+  .added_left{margin-left: 0%;}
+}
+
+/* Optional: You can add more media queries to handle specific device sizes */
