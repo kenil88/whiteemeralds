@@ -71,50 +71,38 @@ class CurrencySupport
 
     public function getUserTimezone()
     {
-        // Get the user's IP address
         $userIp = $this->getUserIpAddress();
 
-        // If the IP is localhost, return a default timezone or a message
-        if ($userIp === '127.0.0.1' || $userIp === '::1') { // Check for IPv6 localhost as well
+        if ($userIp === '127.0.0.1' || $userIp === '::1') {
             return [
                 'ip' => $userIp,
-                'timezone' => 'IST', // Default timezone for localhost
+                'timezone' => 'IST',
                 'message' => 'Testing on localhost, using default timezone UTC.'
             ];
         }
-
-        // Construct the path to the GeoLite2-City.mmdb file located in the storage folder
-        $databasePath = storage_path('app/GeoLite2-City.mmdb');
-
         try {
-            // Initialize the GeoIP2 Reader with the path to the database
-            $reader = new Reader($databasePath);
-
-            // Get the city information for the given IP address
-            $record = $reader->city($userIp);
-
-            // Return the user's timezone in the JSON response
+            $ch = curl_init('https://api.findip.net/' . $userIp . '/?token=850861fa6a09467ba35aeb65822b9f5f');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            $ipwhois = json_decode(curl_exec($ch), true);
+            curl_close($ch);
             return [
                 'ip' => $userIp,
-                'timezone' => $record->location->timeZone
+                'timezone' => $ipwhois['location']['time_zone']
             ];
         } catch (\Exception $e) {
-            // Handle errors (e.g., file not found or invalid IP)
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     private function getUserIpAddress()
     {
-        // Check for HTTP_X_FORWARDED_FOR header first
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            // Handle multiple IPs in the X-Forwarded-For header
-            $ipAddresses = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            return trim($ipAddresses[0]); // Return the first IP
+        if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipAddresses = explode(',', $_SERVER['REMOTE_ADDR']);
+            return trim($ipAddresses[0]);
         }
 
-        // Fallback to REMOTE_ADDR
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'; // Return '0.0.0.0' if REMOTE_ADDR is not set
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
 
@@ -132,29 +120,20 @@ class CurrencySupport
 
         $timezone = $this->getUserTimezone();
 
+        $isLocalhost = ($_SERVER['SERVER_NAME'] === '127.0.0.1' || $_SERVER['SERVER_NAME'] === 'localhost');
 
-        // if (session('currency')) {
-        //     $currency = $this->currencies->where('title', session('currency'))->first();
-        // } elseif ((int) get_ecommerce_setting('enable_auto_detect_visitor_currency', 0) == 1) {
-        //     $currency = $this->currencies->where('title', $this->detectedCurrencyCode())->first();
-        // }
-
-        // if (!empty($userIPAddress) && $userIPAddress['country_code'] == 'IN') {
-        //     $currency = $this->currencies->where('title', 'INR')->first();
-        // } else {
-        //     $currency = $this->currencies->where('title', 'USD')->first();
-        // }
+        $timezone_local = $isLocalhost ? 'IST' : 'Asia/Kolkata';
 
         if (! $currency) {
-            $currency = $this->getDefaultCurrency();
+            if ($timezone['timezone'] === $timezone_local) {
+                $currency = $this->currencies->where('id', 4)->first();
+            } else {
+                $currency = $this->currencies->where('id', 1)->first();
+            }
         }
-        // dd($timezon['timezone'], $currency);
         if (! $currency->is_default) {
             $this->currency = $this->setCurrencyExchangeRate($currency);
         }
-
-        session(['timezone' => $timezone['timezone']]);
-
 
         return $currency;
     }
@@ -165,15 +144,6 @@ class CurrencySupport
 
         if ($currency) {
             return $currency;
-        }
-
-        if ($this->currencies instanceof Collection) {
-            // dd(session('timezone'));
-            if (session('timezone')  === 'IST') {
-                $currency = $this->currencies->where('id', 4)->first();
-            } else {
-                $currency = $this->currencies->where('id', 1)->first();
-            }
         }
 
         if (! $currency) {

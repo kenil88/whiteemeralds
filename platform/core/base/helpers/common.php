@@ -8,6 +8,8 @@ use Botble\Base\Supports\Core;
 use Botble\Base\Supports\DashboardMenu as DashboardMenuSupport;
 use Botble\Base\Supports\Editor;
 use Botble\Base\Supports\PageTitle as PageTitleSupport;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
+
 
 if (! function_exists('language_flag')) {
     function language_flag(?string $flag, ?string $name = null, int $width = 16): string
@@ -108,5 +110,22 @@ if (! function_exists('package_path')) {
     function package_path(?string $path = null): string
     {
         return platform_path('packages' . ($path ? DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR) : ''));
+    }
+}
+
+if (!function_exists('optimize_image')) {
+    function optimize_image($imagePath)
+    {
+
+        if ($customFolder = env('RV_MEDIA_DEFAULT_UPLOAD_FOLDER')) {
+            return public_path($customFolder);
+        }
+
+        $fullPath = is_link(public_path('storage')) ? storage_path('app/public') : public_path('storage');
+
+        // Optimize the image
+        OptimizerChainFactory::create()->optimize($fullPath);
+
+        return $imagePath; // Return the path for rendering
     }
 }

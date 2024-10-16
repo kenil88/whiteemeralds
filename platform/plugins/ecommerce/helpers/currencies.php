@@ -93,7 +93,7 @@ if (! function_exists('format_price_without_symbol')) {
             }
 
             if (! $currency->is_default && $currency->exchange_rate > 0) {
-                $price = $price * $currency->exchange_rate;
+                $price = $price;
             }
         }
 

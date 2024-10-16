@@ -6,7 +6,8 @@
             </div>
         @endif
 
-        <div class="row row-cols-4 row-cols-sm-3 row-cols-lg-4 row-cols-xl-6 g-3">
+        <div class="row row-cols-4 row-cols-sm-3 row-cols-lg-4 row-cols-xl-6 g-3" style="margin-left: 10%;">
+            <div></div>
             @foreach($brands as $brand)
                 <div class="col">
                     <div class="tp-brand-item text-center">

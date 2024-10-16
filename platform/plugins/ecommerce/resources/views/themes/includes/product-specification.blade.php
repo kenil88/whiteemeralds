@@ -107,7 +107,7 @@
             <td>Gemstone Charge</td>
             <td id="GemstoneCharges"></td>
         </tr>
-        <tr>
+        <tr id="GSTRow">
             <td>GST</td>
             <td id="GST"></td>
         </tr>
