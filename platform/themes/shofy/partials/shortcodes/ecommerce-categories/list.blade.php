@@ -7,7 +7,7 @@
                     <div class="tp-product-category-item text-center mb-40">
                         <div class="tp-product-category-thumb fix">
                             <a href="{{ $category->url }}" title="{{ $category->name }}">
-                                {{ RvMedia::image($category->image, $category->name) }}
+                                {{ RvMedia::image(optimize_image($category->image), $category->name, 'medium', true) }}
                             </a>
                         </div>
                         <div class="tp-product-category-content">
