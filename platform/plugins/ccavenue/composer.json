@@ -1,0 +1,8 @@
+{
+    "name": "botble/ccavenue",
+    "description": "CcAvenue Payment Gateway",
+    "type": "package",
+    "require": {
+        "ccavenue/ccavenue-checkout-sdk": "^1.0"
+    }
+}

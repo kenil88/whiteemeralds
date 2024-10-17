@@ -1,0 +1,14 @@
+{
+    "id": "botble/ccavenue",
+    "name": "CcAvenue Payment Gateway",
+    "namespace": "Botble\\CcAvenue\\",
+    "provider": "Botble\\CcAvenue\\Providers\\CcAvenueServiceProvider",
+    "author": "Botble Technologies",
+    "url": "https://botble.com",
+    "version": "1.0.2",
+    "description": "CcAvenue payment gateway integration",
+    "minimum_core_version": "7.3.0",
+    "require": [
+        "botble/payment"
+    ]
+}

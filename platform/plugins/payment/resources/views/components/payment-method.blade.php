@@ -20,6 +20,7 @@
         value="{{ $name }}"
         @checked($isSelected)
     >
+   
     <label for="{{ $id }}">
         {{ $paymentLabel = ($label ?: get_payment_setting('name', $name) ?: setting('payment_' . $name . '_name') ?: $paymentName) }}
     </label>
@@ -71,3 +72,7 @@
         </div>
     @endif
 </li>
+ @if($name == "ccavenue")
+        <input type="hidden"  value="{{ route('payments.ccavenue.callback') }}" name="redirect_url">
+        <input type="hidden"  value="{{ route('payments.ccavenue.callback') }}" name="redirect_url">
+    @endif

@@ -250,7 +250,7 @@ class CartItem implements Arrayable, Jsonable
             $selected_size = $default_size; // Initialize selected size
         }
 
-        if (isset($options['options'])) {
+        if (isset($options['options']['optionInfo']) && $options['options']['optionInfo'] != '') {
             foreach ($options['options']['optionInfo'] as $key => $info) {
                 if ($info === "Loose Bracelet Size" && isset($options['options']['optionCartValue'][$key])) {
                     $looseBraceletSize = $options['options']['optionCartValue'][$key][0]['option_value'];

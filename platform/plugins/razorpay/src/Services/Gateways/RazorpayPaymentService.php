@@ -7,11 +7,7 @@ use Illuminate\Http\Request;
 
 class RazorpayPaymentService extends RazorpayPaymentAbstract
 {
-    public function makePayment(Request $request)
-    {
-    }
+    public function makePayment(Request $request) {}
 
-    public function afterMakePayment(Request $request)
-    {
-    }
+    public function afterMakePayment(Request $request) {}
 }

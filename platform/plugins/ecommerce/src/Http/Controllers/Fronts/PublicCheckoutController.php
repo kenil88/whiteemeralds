@@ -194,8 +194,10 @@ class PublicCheckoutController extends BaseController
             ->available();
 
         $discounts = apply_filters('ecommerce_checkout_discounts_query', $discountsQuery, $products)->get();
-
-        $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $checkoutOrderData->rawTotal, 'orderAmount' => Session::get('price_without_symbol')];
+        $rawTotal = Cart::instance('cart')->rawTotal();
+        $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
+        $orderAmount += (float) $shippingAmount;
+        $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $checkoutOrderData->rawTotal, 'orderAmount' => $orderAmount];
 
         app(GoogleTagManager::class)->beginCheckout($products->all(), $checkoutOrderData->orderAmount);
         app(FacebookPixel::class)->checkout($products->all(), $checkoutOrderData->orderAmount);
