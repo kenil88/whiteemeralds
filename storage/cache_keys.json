@@ -3,7 +3,9 @@
         "876a095a247b966461c4079f23f9e7ae@menu_location_f24b167b089f344dbb5b5e54c121a4ab",
         "876a095a247b966461c4079f23f9e7ae@menu_location_9e8c59e64ece6607bc9c51518db908d6",
         "876a095a247b966461c4079f23f9e7ae@menu_location_d8f05dc6bf6d79c9d0562acdd1517a6f",
-        "876a095a247b966461c4079f23f9e7ae@menu_location_8b26aa1d03a5cba3e883ab2a5b1cc05f"
+        "876a095a247b966461c4079f23f9e7ae@menu_location_8b26aa1d03a5cba3e883ab2a5b1cc05f",
+        "876a095a247b966461c4079f23f9e7ae@menu_location_65eab51ac6bb1fe879feabf83eb3a5ef",
+        "876a095a247b966461c4079f23f9e7ae@menu_location_d3534fa643b6c0bd83037848de96cc5b"
     ],
     "Botble\\Ecommerce\\Models\\ProductCategory": [
         "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_b1def99c2a0f5fcee459d7bbe8920a8b",
@@ -18,7 +20,14 @@
         "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_55b90fbd5e16f275ef325f84b37eb39d",
         "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_fed2d45f335085c7a35cb2e9058094b5",
         "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_0ea56a8dad1ec7da6d89b10577eb5a92",
-        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_50c282652ad7742d118069257b5f35cc"
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_50c282652ad7742d118069257b5f35cc",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_153af24fd4b4fbe4b83bd9067a4b08f7",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_f66a4c7dfa7307590cb924d458ce6c5b",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_3c08b57700d27a22b736e54261e495ae",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_410b28ff6253afc6a31a74b437238647",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_d47e733324531de78faa36938e33fba8",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_ade8373c91b53cacb50575b8bd73e09d",
+        "e2df835384821fa5036252a0581ba12b@ecommerce_categories_for_widgets_2fe2fc588778ba37ea8e76047dc631c4"
     ],
     "Botble\\Ecommerce\\Services\\HandleShippingFeeService": [
         "66d6c800acf0bbfe034c13e9e2145ba3@8093a20ec2d5ada6817b9eaed1fe16c2",

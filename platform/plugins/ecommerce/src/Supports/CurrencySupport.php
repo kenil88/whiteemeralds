@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Locale;
 use Throwable;
 use GeoIp2\Database\Reader;
+use Illuminate\Support\Facades\Cache;
 
 class CurrencySupport
 {
@@ -31,78 +32,65 @@ class CurrencySupport
         session(['currency' => $currency->title]);
     }
 
-    private function getUseIpAddress()
-    {
-        // Your API key from iplocate.io
-        $apiKeys = [
-            '63a4eeeea60762fd496c88fe35d475a6',
-            '82d39517742fdc9c6d02cdcb98e89a54',  // Replace with your second API key
-            'bd10d662fbfc8003532ef31d55646ff0'    // Replace with your third API key
-        ];
-
-        foreach ($apiKeys as $apiKey) {
-            // The API endpoint with the current API key
-            $url = "https://www.iplocate.io/api/lookup/json?apikey={$apiKey}";
-
-            // Send the request to iplocate API
-            $response = Http::get($url);
-
-            // Check if the request was successful
-            if ($response->successful()) {
-                $data = $response->json();
-
-                // Get the country code from the response
-                $countryCode = $data['country_code'] ?? 'Unknown';
-                $country = $data['country'] ?? 'Unknown';
-                $ip = $data['ip'] ?? 'Unknown';
-
-                // Return or use the data as needed
-                return [
-                    'ip' => $ip,
-                    'country' => $country,
-                    'country_code' => $countryCode
-                ];
-            }
-        }
-
-        // If all API keys fail, return an error
-        return 'Unable to fetch location from any API key';
-    }
-
     public function getUserTimezone()
     {
         $userIp = $this->getUserIpAddress();
 
+        // Check for localhost
         if ($userIp === '127.0.0.1' || $userIp === '::1') {
             return [
                 'ip' => $userIp,
                 'timezone' => 'IST',
-                'message' => 'Testing on localhost, using default timezone UTC.'
+                'message' => 'Testing on localhost, using default timezone IST.'
             ];
         }
-        try {
-            $ch = curl_init('https://api.findip.net/' . $userIp . '/?token=850861fa6a09467ba35aeb65822b9f5f');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            $ipwhois = json_decode(curl_exec($ch), true);
-            curl_close($ch);
-            return [
-                'ip' => $userIp,
-                'timezone' => $ipwhois['location']['time_zone']
-            ];
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+
+        // Use caching to store timezone information
+        $cacheKey = 'user_timezone_' . $userIp;
+
+        return Cache::remember($cacheKey, now()->addMinutes(60), function () use ($userIp) {
+            try {
+                $ch = curl_init('https://api.findip.net/' . $userIp . '/?token=850861fa6a09467ba35aeb65822b9f5f');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HEADER, false);
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                if ($response === false) {
+                    throw new \Exception('Unable to fetch timezone data.');
+                }
+
+                $ipwhois = json_decode($response, true);
+
+                return [
+                    'ip' => $userIp,
+                    'timezone' => $ipwhois['location']['time_zone'] ?? 'UTC',
+                    'message' => 'Timezone retrieved successfully.'
+                ];
+            } catch (\Exception $e) {
+                // Log the exception and provide a fallback timezone
+                \Log::error('Error fetching timezone: ' . $e->getMessage());
+                return [
+                    'ip' => $userIp,
+                    'timezone' => 'UTC',
+                    'message' => 'Using default timezone due to an error: ' . $e->getMessage()
+                ];
+            }
+        });
     }
 
     private function getUserIpAddress()
     {
-        if (isset($_SERVER['REMOTE_ADDR'])) {
-            $ipAddresses = explode(',', $_SERVER['REMOTE_ADDR']);
-            return trim($ipAddresses[0]);
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP']; // IP from shared internet
         }
 
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipAddresses = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($ipAddresses[0]); // The first IP address is the user's original IP
+        }
+
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'; // Fallback to REMOTE_ADDR
     }
 
 
@@ -110,33 +98,36 @@ class CurrencySupport
     {
         $currency = $this->currency;
 
-        if (! empty($currency)) {
+        if (!empty($currency)) {
             return $currency;
         }
 
-        if (! $this->currencies instanceof Collection) {
+        if (!($this->currencies instanceof Collection)) {
             $this->currencies();
         }
 
+        // Get user's timezone
         $timezone = $this->getUserTimezone();
 
-        $isLocalhost = ($_SERVER['SERVER_NAME'] === '127.0.0.1' || $_SERVER['SERVER_NAME'] === 'localhost');
+        // Determine the appropriate currency based on timezone
+        $isLocalhost = request()->ip() === '127.0.0.1' || request()->ip() === '::1'; // Check if the request is from localhost
 
+        // Default timezone for the local environment
         $timezone_local = $isLocalhost ? 'IST' : 'Asia/Kolkata';
 
-        if (! $currency) {
-            if ($timezone['timezone'] === $timezone_local) {
-                $currency = $this->currencies->where('id', 4)->first();
-            } else {
-                $currency = $this->currencies->where('id', 1)->first();
-            }
+        if (!$currency) {
+            $currency = ($timezone['timezone'] === $timezone_local)
+                ? $this->currencies->where('id', 4)->first()
+                : $this->currencies->where('id', 1)->first();
         }
+
         if (! $currency->is_default) {
             $this->currency = $this->setCurrencyExchangeRate($currency);
         }
 
         return $currency;
     }
+
 
     public function getDefaultCurrency(): ?Currency
     {
