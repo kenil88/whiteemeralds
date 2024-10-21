@@ -49,11 +49,19 @@ class CartItem implements Arrayable, Jsonable
             throw new InvalidArgumentException('Please supply a valid name.');
         }
 
+        $get_cat_id = DB::select("select parent_id from ec_product_category_product pcp join ec_product_categories pc on pc.id = pcp.category_id where pcp.product_id = '" . $id . "' limit 1");
+
+        $cat_id = $get_cat_id[0]->parent_id;
+
         $this->id = $id;
         $this->name = $name;
         $this->options = new CartItemOptions($options);
         $this->rowId = $this->generateRowId($id, $options);
-        $this->price = $this->calculatePrice();
+        if ($cat_id == 35) {
+            $this->price = $price;
+        } else {
+            $this->price = $this->calculatePrice();
+        }
         $this->created_at = Carbon::now();
         $this->updated_at = Carbon::now();
     }
@@ -212,7 +220,15 @@ class CartItem implements Arrayable, Jsonable
 
     public function toArray(): array
     {
-        $this->price = $this->calculatePrice();
+        $get_cat_id = DB::select("select parent_id from ec_product_category_product pcp join ec_product_categories pc on pc.id = pcp.category_id where pcp.product_id = '" . $this->id . "' limit 1");
+
+        $cat_id = $get_cat_id[0]->parent_id;
+
+        if ($cat_id == 35) {
+            $this->price = $this->price;
+        } else {
+            $this->price = $this->calculatePrice();
+        }
 
         return [
             'rowId' => $this->rowId,
@@ -244,6 +260,8 @@ class CartItem implements Arrayable, Jsonable
         $gemstone_price = 0;
         $stone_weight = '';
         $stone_type = '';
+        $diamond_option_value = '';
+        $metal_purity = '';
 
         if ($cat_id == 25) {
             $default_size = 20; // Reference size

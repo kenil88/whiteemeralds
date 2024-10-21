@@ -12,7 +12,6 @@
 @endphp
 
 <div class="{{ $priceWrapperClassName === null ? 'bb-product-price mb-3' : $priceWrapperClassName }}">
-    @if (in_array($category_id, [35, 36, 37, 38, 39]))
         <span
             class="{{ $priceClassName === null ? 'bb-product-price-text fw-bold' : $priceClassName }}"
             data-bb-value="product-price"
@@ -20,9 +19,10 @@
                 id="new-price"
             @endif
         >
-            {{ $product->price()->displayAsText() }}
+            @if (in_array($category_id, [36, 37, 38, 39])) 
+                {{ $product->price()->displayAsText() }}
+            @endif
         </span>
-    @endif
 </div>
 
 <input name="product_id" type="hidden" value="{{ $product->id }}">
