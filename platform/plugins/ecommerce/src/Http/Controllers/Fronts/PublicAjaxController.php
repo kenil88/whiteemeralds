@@ -124,39 +124,40 @@ class PublicAjaxController extends BaseController
                 ->selectRaw('category_id')
                 ->where('product_id', $product_id)
                 ->first();
-
-            if ($get_cat_id->category_id == 36) {
-                $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.kada');
-                $arr =
-                    [
-                        'total' => $total_price_with_tax * $request['qty'],
-                        'category_id' => $get_cat_id->category_id,
-                    ];
-                return $arr;
-            } elseif ($get_cat_id->category_id == 37) {
-                $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.ring');
-                $arr =
-                    [
-                        'total' => $total_price_with_tax * $request['qty'],
-                        'category_id' => $get_cat_id->category_id,
-                    ];
-                return $arr;
-            } elseif ($get_cat_id->category_id == 38) {
-                $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.set');
-                $arr =
-                    [
-                        'total' => $total_price_with_tax * $request['qty'],
-                        'category_id' => $get_cat_id->category_id,
-                    ];
-                return $arr;
-            } elseif ($get_cat_id->category_id == 39) {
-                $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.earring');
-                $arr =
-                    [
-                        'total' => $total_price_with_tax * $request['qty'],
-                        'category_id' => $get_cat_id->category_id,
-                    ];
-                return $arr;
+            if (get_application_currency_id() == 1) {
+                if ($get_cat_id->category_id == 36) {
+                    $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.kada');
+                    $arr =
+                        [
+                            'total' => $total_price_with_tax * $request['qty'],
+                            'category_id' => $get_cat_id->category_id,
+                        ];
+                    return $arr;
+                } elseif ($get_cat_id->category_id == 37) {
+                    $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.ring');
+                    $arr =
+                        [
+                            'total' => $total_price_with_tax * $request['qty'],
+                            'category_id' => $get_cat_id->category_id,
+                        ];
+                    return $arr;
+                } elseif ($get_cat_id->category_id == 38) {
+                    $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.set');
+                    $arr =
+                        [
+                            'total' => $total_price_with_tax * $request['qty'],
+                            'category_id' => $get_cat_id->category_id,
+                        ];
+                    return $arr;
+                } elseif ($get_cat_id->category_id == 39) {
+                    $total_price_with_tax = $price = config('plugins.ecommerce.general.925_price.earring');
+                    $arr =
+                        [
+                            'total' => $total_price_with_tax * $request['qty'],
+                            'category_id' => $get_cat_id->category_id,
+                        ];
+                    return $arr;
+                }
             }
             $tax_info = null;
             if ($product_info) {
@@ -186,68 +187,70 @@ class PublicAjaxController extends BaseController
             $diamond_final_type = '';
             $diamond_price = 0;
             $metal_purity = '';
+            $making_charges = 0;
+            $certificate_charges = 0;
 
             if ($get_cat_id->category_id == 25) {
                 $default_size = 20; // Reference size
                 $selected_size = $default_size; // Initialize selected size
             }
+            if ($request['options']) {
+                foreach ($request['options'] as $product_option_id => $value) {
+                    // Fetch options related to the product
+                    if (is_array($value) && isset($value['values'])) {
+                        $value = $value['values'];
+                    } elseif (is_string($value)) {
+                        $value = $value;
+                    }
 
+                    $option_query = Option::select(
+                        'ec_option_value.id as opv_id',
+                        'ec_options.name',
+                        'ec_option_value.affect_price',
+                        'ec_options.id as op_id',
+                        'ec_option_value.option_value',
+                        'ec_option_value.weight'
+                    )->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
+                        ->where('ec_options.product_id', $product_id)
+                        ->get();
 
-            foreach ($request['options'] as $product_option_id => $value) {
-                // Fetch options related to the product
-                if (is_array($value) && isset($value['values'])) {
-                    $value = $value['values'];
-                } elseif (is_string($value)) {
-                    $value = $value;
-                }
-
-                $option_query = Option::select(
-                    'ec_option_value.id as opv_id',
-                    'ec_options.name',
-                    'ec_option_value.affect_price',
-                    'ec_options.id as op_id',
-                    'ec_option_value.option_value',
-                    'ec_option_value.weight'
-                )->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
-                    ->where('ec_options.product_id', $product_id)
-                    ->get();
-
-                if ($option_query->count()) {
-                    foreach ($option_query as $option) {
-                        $option_value = trim($option['option_value']);
-                        $weight = $option['weight'];
-                        // Check if the selected option is Natural or Lab-grown Diamond
-                        if ($option['name'] == 'Diamond') {
-                            if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
-                                $diamond_price = $option['affect_price'];  // Set weight for natural diamond
-                                $diamond_type = 'natural';  // Mark diamond type as natural
+                    if ($option_query->count()) {
+                        foreach ($option_query as $option) {
+                            $option_value = trim($option['option_value']);
+                            $weight = $option['weight'];
+                            // Check if the selected option is Natural or Lab-grown Diamond
+                            if ($option['name'] == 'Diamond') {
+                                if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
+                                    $diamond_price = $option['affect_price'];  // Set weight for natural diamond
+                                    $diamond_type = 'natural';  // Mark diamond type as natural
+                                }
+                                if ($option_value == 'Lab Grown Diamond') {
+                                    $labgrown_weight = $option['weight'];
+                                }
+                                if ($value == 'Lab Grown Diamond' && $option_value == 'Lab Grown Diamond') {
+                                    $diamond_weight = $weight;  // Set weight for lab-grown diamond
+                                    $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
+                                }
+                            } elseif ($option['name'] == 'Gem Stone' || $option['name'] == 'Black Diamond') {
+                                $gemstone_price = $option['affect_price'];
+                                $stone_type = $option['option_value'];
+                                $stone_weight = $option['weight'];
                             }
-                            if ($option_value == 'Lab Grown Diamond') {
-                                $labgrown_weight = $option['weight'];
+                            // Check if the selected option is 14K or 18K gold
+                            if ($value == '14K' && $option_value == '14K') {
+                                $gold_weight = $weight;  // Set weight for 14k gold
+                                $metal_purity = '14k';  // Mark gold purity as 14k
+                            } elseif ($value == '18K' && $option_value == '18K') {
+                                $gold_weight = $weight;  // Set weight for 18k gold
+                                $metal_purity = '18k';  // Mark gold purity as 18k
+                            } elseif ($value == '10K' && $option_value == '10K') {
+                                $gold_weight = $weight;  // Set weight for 18k gold
+                                $metal_purity = '10k';  // Mark gold purity as 18k
                             }
-                            if ($value == 'Lab Grown Diamond' && $option_value == 'Lab Grown Diamond') {
-                                $diamond_weight = $weight;  // Set weight for lab-grown diamond
-                                $diamond_type = 'labgrown'; // Mark diamond type as lab-grown
-                            }
-                        } elseif ($option['name'] == 'Gem Stone' || $option['name'] == 'Black Diamond') {
-                            $gemstone_price = $option['affect_price'];
-                            $stone_type = $option['option_value'];
-                            $stone_weight = $option['weight'];
-                        }
-                        // Check if the selected option is 14K or 18K gold
-                        if ($value == '14K' && $option_value == '14K') {
-                            $gold_weight = $weight;  // Set weight for 14k gold
-                            $metal_purity = '14k';  // Mark gold purity as 14k
-                        } elseif ($value == '18K' && $option_value == '18K') {
-                            $gold_weight = $weight;  // Set weight for 18k gold
-                            $metal_purity = '18k';  // Mark gold purity as 18k
-                        } elseif ($value == '10K' && $option_value == '10K') {
-                            $gold_weight = $weight;  // Set weight for 18k gold
-                            $metal_purity = '10k';  // Mark gold purity as 18k
-                        }
 
-                        if (is_numeric($value)) {
-                            $selected_size = $value;
+                            if (is_numeric($value)) {
+                                $selected_size = $value;
+                            }
                         }
                     }
                 }
@@ -392,7 +395,6 @@ class PublicAjaxController extends BaseController
 
                 $total_price_with_tax = round($total_price_with_tax, 2);
             } else {
-
                 $price = round($gold_price / get_current_exchange_rate(), 2);
                 $gold_price = round($gold_price / get_current_exchange_rate(), 2);
                 $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
