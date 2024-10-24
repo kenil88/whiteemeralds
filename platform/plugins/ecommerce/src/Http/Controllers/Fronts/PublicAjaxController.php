@@ -195,6 +195,7 @@ class PublicAjaxController extends BaseController
                 $selected_size = $default_size; // Initialize selected size
             }
             if ($request['options']) {
+
                 foreach ($request['options'] as $product_option_id => $value) {
                     // Fetch options related to the product
                     if (is_array($value) && isset($value['values'])) {
@@ -202,6 +203,7 @@ class PublicAjaxController extends BaseController
                     } elseif (is_string($value)) {
                         $value = $value;
                     }
+
 
                     $option_query = Option::select(
                         'ec_option_value.id as opv_id',
@@ -260,7 +262,7 @@ class PublicAjaxController extends BaseController
             // category id = 24 is for gentes
             if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
                 $size_difference = (int) $selected_size - $default_size; // Calculate the size difference
-
+                // dd($selected_size);
                 // Adjust gold weight by 0.150 for each size difference
                 $weight_change = abs($size_difference) * 0.150;
 
@@ -317,9 +319,9 @@ class PublicAjaxController extends BaseController
                 $diamond_price = $diamond_price;
                 $diamond_name = 'Natural Diamond';
                 $diamond_weight = $labgrown_weight;
-                $diamond_final_type = 'EF Vvs';
+                $diamond_final_type = 'EF Vvs / vs';
                 if (get_application_currency_id() == 1) {
-                    $diamond_final_type = 'EF Vvs / vs';
+                    $diamond_final_type = 'HI SI';
                 }
             }
             if ($diamond_type == 'labgrown') {
@@ -336,7 +338,7 @@ class PublicAjaxController extends BaseController
                 $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
                 $diamond_final_type = 'EF Vvs / VS';
                 if (get_application_currency_id() == 1) {
-                    $diamond_final_type = 'HI SI';
+                    $diamond_final_type = 'EF Vvs / VS';
                 }
             }
 
@@ -379,7 +381,6 @@ class PublicAjaxController extends BaseController
                 $diamond_price = $diamond_price;
                 $certificate_charges = (float) config('plugins.ecommerce.general.certificate_charge.India');
                 $making_charges = (float) config('plugins.ecommerce.general.making_charge.India');
-
 
                 if ($gold_weight <= 5) {
                     $making_charges *= 5;
