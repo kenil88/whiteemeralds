@@ -211,7 +211,8 @@ class PublicAjaxController extends BaseController
                         'ec_option_value.affect_price',
                         'ec_options.id as op_id',
                         'ec_option_value.option_value',
-                        'ec_option_value.weight'
+                        'ec_option_value.weight',
+                        'ec_option_value.affect_price_usd'
                     )->join('ec_option_value', 'ec_option_value.option_id', 'ec_options.id')
                         ->where('ec_options.product_id', $product_id)
                         ->get();
@@ -223,7 +224,12 @@ class PublicAjaxController extends BaseController
                             // Check if the selected option is Natural or Lab-grown Diamond
                             if ($option['name'] == 'Diamond') {
                                 if ($value == 'Natural Diamond' && $option_value == 'Natural Diamond') {
-                                    $diamond_price = $option['affect_price'];  // Set weight for natural diamond
+                                    if (get_application_currency_id() == 4) {
+                                        $diamond_price = $option['affect_price'];  // Set weight for natural diamond
+                                    } else {
+                                        $diamond_price = $option['affect_price_usd'];  // Set weight for natural diamond
+
+                                    }
                                     $diamond_type = 'natural';  // Mark diamond type as natural
                                 }
                                 if ($option_value == 'Lab Grown Diamond') {
@@ -262,7 +268,6 @@ class PublicAjaxController extends BaseController
             // category id = 24 is for gentes
             if ($get_cat_id->category_id == 23 || $get_cat_id->category_id == 24 || $get_cat_id->category_id == 34) {
                 $size_difference = (int) $selected_size - $default_size; // Calculate the size difference
-                // dd($selected_size);
                 // Adjust gold weight by 0.150 for each size difference
                 $weight_change = abs($size_difference) * 0.150;
 
@@ -300,7 +305,6 @@ class PublicAjaxController extends BaseController
                     $increments = abs($size_difference) / 0.5; // How many 0.01 increments
                 }
 
-                // $size_difference = (float) $selected_size - $default_size; // Calculate the size difference
                 // Adjust gold weight by 0.250 for each size difference
                 $weight_change = ($gold_weight * ($increments * 5)) / 100; // Total percentage change based on increments
 
@@ -330,15 +334,17 @@ class PublicAjaxController extends BaseController
                     $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges.labgrown'); // Example price for lab-grown diamond (per carat)
                 } else {
                     if ($diamond_weight > '0.20') {
-                        $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges_USD.upto_20'); // Example price for lab-grown diamond (per carat)
-                    } else {
                         $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges_USD.after_20'); // Example price for lab-grown diamond (per carat)
+                    } else {
+                        $labgrown_diamond_price_per_carat = config('plugins.ecommerce.general.diamond_charges_USD.upto_20'); // Example price for lab-grown diamond (per carat)
                     }
                 }
                 $diamond_price = $diamond_weight * $labgrown_diamond_price_per_carat;
+
                 $diamond_final_type = 'EF Vvs / VS';
                 if (get_application_currency_id() == 1) {
                     $diamond_final_type = 'EF Vvs / VS';
+                    $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
                 }
             }
 
@@ -374,7 +380,6 @@ class PublicAjaxController extends BaseController
                     $gold_price = $gold_weight * config('plugins.ecommerce.general.gold_price.10K'); // Example price for 10k gold (per gram)
                 }
             }
-
             if (get_application_currency_id() == 4) {
                 $price = round($gold_price, 2);
                 $gold_price = $gold_price;
@@ -398,7 +403,7 @@ class PublicAjaxController extends BaseController
             } else {
                 $price = round($gold_price / get_current_exchange_rate(), 2);
                 $gold_price = round($gold_price / get_current_exchange_rate(), 2);
-                $diamond_price = round($diamond_price / get_current_exchange_rate(), 2);
+                $diamond_price = $diamond_price;
                 $certificate_charges = (float) round(config('plugins.ecommerce.general.certificate_charge.Out_of_india') / get_current_exchange_rate(), 2);
                 $making_charges = (float) round(config('plugins.ecommerce.general.making_charge.Out_of_india') / get_current_exchange_rate(), 2);
                 if ($gold_weight <= 5) {
@@ -414,7 +419,6 @@ class PublicAjaxController extends BaseController
                 $total_price_with_tax = $tax + $final_price;
                 $total_price_with_tax = round($total_price_with_tax, 2);
             }
-
             // Output total price and individual prices for debugging
             $arr =
                 [

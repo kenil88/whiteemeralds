@@ -24,8 +24,8 @@ return [
         'allowed_mime_types' => env('DIGITAL_PRODUCT_ALLOWED_MIME_TYPES', []),
     ],
     'certificate_charge' => [
-        'India' => 1800,
-        'Out_of_india' => 3000
+        'India' => 2100,
+        'Out_of_india' => 3300
     ],
     'making_charge' => [
         'India' => 2000,
@@ -50,7 +50,7 @@ return [
         'labgrown'   =>  30000
     ],
     'diamond_charges_USD'    =>  [
-        'upto_20'   =>  150000,
+        'upto_20'   =>  200000,
         'after_20'   =>  120000,
     ],
     'dollar_price'    => 83,
