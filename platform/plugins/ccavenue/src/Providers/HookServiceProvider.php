@@ -121,7 +121,6 @@ class HookServiceProvider extends ServiceProvider
                 throw new Exception('Missing redirect_url or cancel_url.');
             }
 
-
             $orderId = $data['checkout_token'] ?? Str::random(20);
             $amount = $data['amount'];
             $currency = $data['currency'];
@@ -136,20 +135,16 @@ class HookServiceProvider extends ServiceProvider
                 'cancel_url' => $cancelUrl,
             ];
 
-
             Log::info('Data:', ['requestData' => $requestData]);
-
-            // Generate checksum
-            $checksum = $this->generateCcavenueChecksum($merchant_id, $orderId, $amount, $currency, $redirectUrl, $cancelUrl, $working_key);
-            $requestData['checksum'] = $checksum;
 
             do_action('payment_before_making_api_request', CCAVENUE_PAYMENT_METHOD_NAME, $requestData);
 
             // Additional logic
-            $data['orderId'] = $orderId;
-            $data['checksum'] = $checksum;
+            $data['order_id'] = $orderId;
             $data['merchant_id'] = $merchant_id;
             $data['amount'] = $amount;
+            $data['language'] = 'EN';
+            $data['merchant_id'] = $merchant_id;
             $data['currency'] = $currency;
             $data['redirect_url'] = $redirectUrl;  // Ensure it gets set
             $data['cancel_url'] = $cancelUrl;
@@ -168,7 +163,6 @@ class HookServiceProvider extends ServiceProvider
         return $html;
     }
 
-
     public function checkoutWithCcAvenue(array $data, Request $request): array
     {
         if ($data['type'] !== CCAVENUE_PAYMENT_METHOD_NAME) {
@@ -182,9 +176,9 @@ class HookServiceProvider extends ServiceProvider
         // Retrieve CCAvenue payment response fields
         $orderId = $request->input('order_id');
         $amount = $request->input('sub_total');
-        // $trackingId = $request->input('tracking_id');
-        $statusCode = $request->input('order_status');
-        // $checksum = $request->input('checksum');
+        $statusCode = $request->input('status');
+
+        Log::info($statusCode);
 
         // Log missing fields for better diagnostics
         if (! $orderId) {
@@ -200,56 +194,75 @@ class HookServiceProvider extends ServiceProvider
         $merchantId = get_payment_setting('merchant_id', CCAVENUE_PAYMENT_METHOD_NAME);
         $workingKey = get_payment_setting('working_key', CCAVENUE_PAYMENT_METHOD_NAME);
 
-        // Verify the checksum to ensure data integrity
-        $isValidChecksum = $this->verifyCcavenueChecksum($orderId, $merchantId, $workingKey, $amount);
-
-        if (! $isValidChecksum) {
-            Log::error('CCAvenue Payment Error: Checksum verification failed.');
-            $data['error'] = true;
-            $data['message'] = __('Payment failed: Checksum verification failed.');
-            return $data;
-        }
-
         // Set initial amount and status
         $amount = $paymentData['amount'];
-        $status = PaymentStatusEnum::PENDING;
 
-        // Handle payment status based on CCAvenue response
-        switch ($statusCode) {
-            case 'Success':
-                $status = PaymentStatusEnum::COMPLETED;
-                break;
 
-            case 'Failure':
-                $status = PaymentStatusEnum::FAILED;
-                break;
+        $redirectUrl = $data['redirect_url'] ?? route('payments.ccavenue.callback');  // Ensure fallback exists
+        $cancelUrl = $data['cancel_url'] ?? route('payments.ccavenue.cancel');  // Ensure fallback exists
 
-            default:
-                $status = PaymentStatusEnum::PENDING;
-        }
-
-        // Update order data and return it
-        $data['status'] = $status;
-        // $data['charge_id'] = $trackingId;
         $data['amount'] = $amount;
+        $data['order_id'] = $orderId;
         $data['currency'] = $paymentData['currency'];
-        $data['payment_channel'] = CCAVENUE_PAYMENT_METHOD_NAME;
+        $data['redirect_url'] = $redirectUrl;  // Ensure it gets set
+        $data['cancel_url'] = $cancelUrl;
+        $data['language'] = "EN";
+        $data['merchant_id'] = $merchantId;
+        $merchant_data = "";
+
+        $access_code = get_payment_setting('access_key', CCAVENUE_PAYMENT_METHOD_NAME);
+
+        $ccavenue_url = get_payment_setting('url', CCAVENUE_PAYMENT_METHOD_NAME);
+
+        foreach ($data as $key => $value) {
+            $merchant_data .= $key . '=' . $value . '&';
+        }
+        $encrypted_data = $this->encryptCC($merchant_data, $workingKey);
+        $data['url'] = $ccavenue_url . '/transaction/transaction.do?command=initiateTransaction&encRequest=' . $encrypted_data . '&access_code=' . $access_code;
 
         return $data;
     }
 
-    // Generate CCAvenue checksum
-    protected function generateCcavenueChecksum(...$data)
+    public function encryptCC($plainText, $key)
     {
-        $str = implode('|', $data);
-        return hash('sha256', $str);  // Ensure proper hash algorithm per CCAvenue documentation
+        $key = $this->hextobin(md5($key));
+        $initVector = pack("C*", 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f);
+        $openMode = openssl_encrypt($plainText, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $initVector);
+        $encryptedText = bin2hex($openMode);
+        return $encryptedText;
     }
 
-    // Verify CCAvenue checksum
-    protected function verifyCcavenueChecksum($orderId, $merchantId, $workingKey, $amount)
+    public function decryptCC($encryptedText, $key)
     {
-        $generatedChecksum = $this->generateCcavenueChecksum($orderId, $merchantId, $workingKey, $amount);
+        $key = $this->hextobin(md5($key));
+        $initVector = pack("C*", 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f);
+        $encryptedText = $this->hextobin($encryptedText);
+        $decryptedText = openssl_decrypt($encryptedText, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $initVector);
+        return $decryptedText;
+    }
 
-        return $generatedChecksum;
+    public function pkcs5_padCC($plainText, $blockSize)
+    {
+        $pad = $blockSize - (strlen($plainText) % $blockSize);
+        return $plainText . str_repeat(chr($pad), $pad);
+    }
+
+    public function hextobin($hexString)
+    {
+        $length = strlen($hexString);
+        $binString = "";
+        $count = 0;
+        while ($count < $length) {
+            $subString = substr($hexString, $count, 2);
+            $packedString = pack("H*", $subString);
+            if ($count == 0) {
+                $binString = $packedString;
+            } else {
+                $binString .= $packedString;
+            }
+
+            $count += 2;
+        }
+        return $binString;
     }
 }
