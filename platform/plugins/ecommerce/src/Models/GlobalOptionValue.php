@@ -13,6 +13,7 @@ class GlobalOptionValue extends BaseModel
         'option_id',
         'option_value',
         'affect_price',
+        'affect_price_usd',
         'affect_type',
         'weight',
         'order',
@@ -20,6 +21,7 @@ class GlobalOptionValue extends BaseModel
 
     protected $casts = [
         'affect_price' => 'float',
+        'affect_price_usd' => 'float',
         'weight' => 'float',
     ];
 

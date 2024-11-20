@@ -8,6 +8,8 @@
     ]);
     $oldOption = old('options', []) ?? [];
     $currentProductOption = $product->options;
+
+    // dd($currentProductOption);
     foreach ($currentProductOption as $key => $option) {
         $currentProductOption[$key]['name'] = $option->name;
         foreach ($option['values'] as $valueKey => $value) {
@@ -100,6 +102,9 @@
                         <input type="number" name="options[__index__][values][0][affect_price]" class="form-control option-label" value="__affectPrice__" placeholder="__affectPriceLabel__"/>
                     </td>
                     <td>
+                        <input type="number" name="options[__index__][values][0][affect_price_usd]" class="form-control option-label" value="__affectUSDPrice__" placeholder="__affectPriceUSDLabel__"/>
+                    </td>
+                    <td>
                         <input type="text" name="options[__index__][values][0][weight]" class="form-control option-label" value="__affectWeight__" placeholder="Weight"/>
                     </td>
                     <td>
@@ -123,6 +128,7 @@
                 <th scope="col">__label__</th>
                 @if ($isDefaultLanguage)
                     <th scope="col">__priceLabel__</th>
+                    <th scope="col">USD Price</th>
                     <th scope="col">Weight</th>
                     <th scope="col" colspan="2">__priceTypeLabel__</th>
                 @endif
@@ -149,6 +155,9 @@
             @if ($isDefaultLanguage)
                 <td>
                     <input type="number" name="options[__index__][values][__key__][affect_price]" class="form-control affect_price" value="__affectPrice__" placeholder="__affectPriceLabel__" />
+                </td>
+                <td>
+                    <input type="number" name="options[__index__][values][__key__][affect_price_usd]" class="form-control affect_price_usd" value="__affectUSDPrice__" placeholder="__affectPriceLabel__" />
                 </td>
                 <td>
                     <input type="text" name="options[__index__][values][__key__][weight]" class="form-control weight" value="__affectWeight__" placeholder="Weight" />

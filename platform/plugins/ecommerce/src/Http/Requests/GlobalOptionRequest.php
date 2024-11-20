@@ -15,6 +15,7 @@ class GlobalOptionRequest extends Request
             'options' => ['nullable'],
             'options.*.option_value' => ['nullable', 'string'],
             'options.*.affect_price' => ['nullable', 'numeric'],
+            'options.*.affect_price_usd' => ['nullable', 'numeric'],
             'options.*.weight' => ['nullable', 'numeric'],
             'options.*.affect_type' => ['nullable', 'integer'],
             'option_type' => [

@@ -15,6 +15,7 @@ class OptionValue extends BaseModel
         'option_id',
         'option_value',
         'affect_price',
+        'affect_price_usd',
         'affect_type',
         'weight',
         'order',

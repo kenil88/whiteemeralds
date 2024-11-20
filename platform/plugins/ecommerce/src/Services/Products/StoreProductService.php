@@ -55,6 +55,11 @@ class StoreProductService
             ]);
         }
 
+        $product->diamond_qty = $request->input('diamond_qty');
+        $product->gemstone_qty = $request->input('gemstone_qty');
+        $product->thikness = $request->input('thikness');
+        $product->diameter = $request->input('diameter');
+
         if ($sku = $request->input('sku')) {
             $product->sku = $sku;
         }
@@ -153,7 +158,7 @@ class StoreProductService
         }
 
         $specificationAttributes = $request->collect('specification_attributes')
-            ->mapWithKeys(fn ($item, $key) => [$key => [
+            ->mapWithKeys(fn($item, $key) => [$key => [
                 'value' => $item['value'] ?? null,
                 'hidden' => $item['hidden'] ?? false,
                 'order' => $item['order'] ?? 0,

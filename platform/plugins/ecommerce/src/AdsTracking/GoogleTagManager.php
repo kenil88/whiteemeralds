@@ -157,7 +157,7 @@ class GoogleTagManager
             return $this;
         }
 
-        $items = array_map(fn (GoogleTagItem $item) => $item->toArray(), $this->formatItems($items));
+        $items = array_map(fn(GoogleTagItem $item) => $item->toArray(), $this->formatItems($items));
 
         $data = apply_filters('ecommerce.google_tag_manager.push_event', [
             ...$attributes,

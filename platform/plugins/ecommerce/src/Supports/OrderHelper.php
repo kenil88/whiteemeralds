@@ -584,7 +584,7 @@ class OrderHelper
             }
 
             $optionValue = OptionValue::query()
-                ->select(['option_value', 'affect_price', 'affect_type', 'weight'])
+                ->select(['option_value', 'affect_price', 'affect_price_usd', 'affect_type', 'weight'])
                 ->where('option_id', $key);
 
             if ($option['option_type'] != 'field') {

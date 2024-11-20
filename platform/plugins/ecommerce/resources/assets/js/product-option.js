@@ -91,6 +91,7 @@ $(() => {
                         values: [
                             {
                                 affect_price: 0,
+                                affect_price_usd: 0,
                                 weight:0,
                                 affect_type: 0,
                             },
@@ -112,11 +113,13 @@ $(() => {
             let index = element.parents('.accordion-item').data('product-option-index')
             let tr = table.find('tr').last().clone()
             let labelName = 'options[' + index + '][values][' + table.find('tr').length + '][option_value]',
-                affectName = 'options[' + index + '][values][' + table.find('tr').length + '][affect_price]',
+                affectPrice = 'options[' + index + '][values][' + table.find('tr').length + '][affect_price]',
+                affectUSDPricce = 'options[' + index + '][values][' + table.find('tr').length + '][affect_price_usd]',
                 weight = 'options[' + index + '][values][' + table.find('tr').length + '][weight]',
                 affectTypeName = 'options[' + index + '][values][' + table.find('tr').length + '][affect_type]'
             tr.find('.option-label').prop('name', labelName).val('')
-            tr.find('.affect_price').prop('name', affectName).val(0)
+            tr.find('.affect_price').prop('name', affectPrice).val(0)
+            tr.find('.affect_price_usd').prop('name', affectUSDPricce).val(0)
             tr.find('.weight').prop('name', weight).val(0)
             tr.find('.affect_type').prop('name', affectTypeName).val(0)
             tr.find('.option-value-order').val(table.find('tr').length)
@@ -203,8 +206,10 @@ $(() => {
                         .replace(/__id__/g, values[0].id)
                         .replace(/__index__/g, index)
                         .replace(/__affectPrice__/g, values[0].affect_price)
+                        .replace(/__affectUSDPrice__/g, values[0].affect_price_usd)
                         .replace(/__affectWeight__/g, values[0].weight)
                         .replace(/__affectPriceLabel__/g, productOptionLang.affect_price_label)
+                        .replace(/__affectUSDPriceLabel__/g, productOptionLang.affect_usd_price_label)
                         .replace(/__selectedFixed__/g, selectedFixed)
                         .replace(/__fixedLang__/g, productOptionLang.fixed)
                         .replace(/__selectedPercent__/g, selectedPercent)
@@ -214,6 +219,7 @@ $(() => {
                         values = [
                             {
                                 affect_price: 0,
+                                affect_price_usd: 0,
                                 weight:0,
                                 affect_type: 0,
                                 option_value: '',
@@ -241,11 +247,13 @@ $(() => {
                             .replace(/__index__/g, index)
                             .replace(/__labelPlaceholder__/g, productOptionLang.label_placeholder)
                             .replace(/__affectPriceLabel__/g, productOptionLang.affect_price_label)
+                            .replace(/__affectUSDPriceLabel__/g, productOptionLang.affect_price_usd_label)
                             .replace(/__selectedFixed__/g, selectedFixed)
                             .replace(/__fixedLang__/g, productOptionLang.fixed)
                             .replace(/__selectedPercent__/g, selectedPercent)
                             .replace(/__option_value_input__/g, value.option_value ? value.option_value : '')
                             .replace(/__affectPrice__/g, value.affect_price)
+                            .replace(/__affectUSDPrice__/g, value.affect_price_usd)
                             .replace(/__affectWeight__/g, value.weight)
                             .replace(/__percentLang__/g, productOptionLang.percent)
                     })

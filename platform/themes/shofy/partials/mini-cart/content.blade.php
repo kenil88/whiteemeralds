@@ -48,7 +48,7 @@
                             data-bb-toggle="remove-from-cart"
                             {!! EcommerceHelper::jsAttributes('remove-from-cart', $product, ['data-product-quantity' => $cartItem->qty]) !!}
                         >
-                            <x-core::icon name="ti ti-x" />
+                            <x-core::icon name="ti ti-trash" />
                         </a>
                     </div>
                 @endif

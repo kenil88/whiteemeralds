@@ -230,6 +230,58 @@
                     </x-slot:prepend>
                 </x-core::form.text-input>
             </div>
+            <div class="col-md-3 col-md-6">
+                <x-core::form.text-input
+                    label="{{ trans('plugins/ecommerce::products.form.shipping.diamond_qty') }}"
+                    :value="old('diamond_qty', $product ? $product->diamond_qty : $originalProduct->diamond_qty ?? 0)"
+                    name="diamond_qty"
+                    class="input-mask-number"
+                    :group-flat="true"
+                >
+                    <x-slot:prepend>
+                        <span class="input-group-text">Diamond Qty</span>
+                    </x-slot:prepend>
+                </x-core::form.text-input>
+            </div>
+            <div class="col-md-3 col-md-6">
+                <x-core::form.text-input
+                    label="{{ trans('plugins/ecommerce::products.form.shipping.gemstone_qty') }}"
+                    :value="old('gemstone_qty', $product ? $product->gemstone_qty : $originalProduct->gemstone_qty ?? 0)"
+                    name="gemstone_qty"
+                    class="input-mask-number"
+                    :group-flat="true"
+                >
+                    <x-slot:prepend>
+                        <span class="input-group-text">Gemstone Qty</span>
+                    </x-slot:prepend>
+                </x-core::form.text-input>
+            </div>
+            <div class="col-md-3 col-md-6">
+                <x-core::form.text-input
+                    label="{{ trans('plugins/ecommerce::products.form.shipping.thikness') }}"
+                    :value="old('thikness', $product ? $product->thikness : $originalProduct->thikness ?? 0)"
+                    name="thikness"
+                    class="input-mask-number"
+                    :group-flat="true"
+                >
+                    <x-slot:prepend>
+                        <span class="input-group-text">Thikness</span>
+                    </x-slot:prepend>
+                </x-core::form.text-input>
+            </div>
+            <div class="col-md-3 col-md-6">
+                <x-core::form.text-input
+                    label="{{ trans('plugins/ecommerce::products.form.shipping.diameter') }}"
+                    :value="old('diameter', $product ? $product->diameter : $originalProduct->diameter ?? 0)"
+                    name="diameter"
+                    class="input-mask-number"
+                    :group-flat="true"
+                >
+                    <x-slot:prepend>
+                        <span class="input-group-text">Diameter</span>
+                    </x-slot:prepend>
+                </x-core::form.text-input>
+            </div>
         </div>
     </x-core::form.fieldset>
 @endif

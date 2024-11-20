@@ -60,6 +60,15 @@
         {!! apply_filters('ecommerce_cart_after_item_content', null, $cartItem) !!}
     </div>
     <div class="col-auto text-end">
-        <p>{{ format_price($cartItem->price) }}</p>
+        <p>{{ format_price($cartItem->price) }}
+        <a
+            href="{{ route('public.cart.remove', $cartItem->rowId) }}"
+            class="cartmini__del"
+            title="{{ __('Remove this item') }}"
+            data-bb-toggle="remove-from-cart"
+            {!! EcommerceHelper::jsAttributes('remove-from-cart', $product, ['data-product-quantity' => $cartItem->qty]) !!}
+        >
+            <x-core::icon name="ti ti-trash" />
+        </a></p>
     </div>
 </div>

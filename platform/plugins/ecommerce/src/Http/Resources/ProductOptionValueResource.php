@@ -21,6 +21,7 @@ class ProductOptionValueResource extends JsonResource
             'order' => $this->order,
             'affect_type' => $this->affect_type,
             'affect_price' => $this->affect_price,
+            'affect_price_usd' => $this->affect_price_usd,
             'weight' => $this->weight,
             'title' => $this->option_value . $formatPrice,
             'format_price' => $formatPrice,

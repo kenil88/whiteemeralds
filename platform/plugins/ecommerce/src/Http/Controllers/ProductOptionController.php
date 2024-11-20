@@ -126,9 +126,11 @@ class ProductOptionController extends BaseController
         if (in_array($type, $textTypeArr)) {
             $globalOptionValue = new GlobalOptionValue();
             $item['affect_price'] = $data['affect_price'] ?? 0;
+            $item['affect_price_usd'] = $data['affect_price_usd'] ?? 0;
             $item['weight'] = $data['weight'] ?? 0;
             $item['affect_type'] = $data['affect_type'] ?? GlobalOptionEnum::TYPE_PERCENT;
             $item['option_value'] = 'n/a';
+            $item['product_id'] = $data['product_id'];
             $globalOptionValue->fill($item);
             $values[] = $globalOptionValue;
 
@@ -147,8 +149,10 @@ class ProductOptionController extends BaseController
                 $globalOptionValue = new GlobalOptionValue();
             }
 
+            $item['affect_price_usd'] = ! empty($item['affect_price_usd']) ? $item['affect_price_usd'] : 0;
             $item['affect_price'] = ! empty($item['affect_price']) ? $item['affect_price'] : 0;
             $item['weight'] = ! empty($item['weight']) ? $item['weight'] : 0;
+            $item['product_id'] = $item['product_id'];
             $item['order'] = $index;
             $globalOptionValue->fill($item);
             $values[] = $globalOptionValue;
